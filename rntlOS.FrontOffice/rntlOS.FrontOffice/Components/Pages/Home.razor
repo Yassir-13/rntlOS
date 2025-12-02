@@ -1,0 +1,114 @@
+﻿@page "/"
+@using rntlOS.Core.Services
+@using rntlOS.Core.Models
+@inject VehiculeService VehiculeService
+@inject NavigationManager Navigation
+
+<PageTitle>rntlOS - Location de voitures</PageTitle>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h1>Bienvenue chez <span class="brand">rntl<strong>OS</strong></span></h1>
+        <p class="lead">Louez votre véhicule en quelques clics</p>
+        <button class="btn btn-primary btn-lg" @onclick="VoirVehicules">
+            Voir nos véhicules disponibles
+        </button>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Véhicules disponibles</h2>
+
+    @if (vehicules == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+    }
+    else if (!vehicules.Any())
+    {
+        <div class="alert alert-info">
+            Aucun véhicule disponible pour le moment.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var vehicule in vehicules.Take(6))
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card vehicle-card">
+                        <div class="card-body">
+                            <h5 class="card-title">@vehicule.Marque @vehicule.Modele</h5>
+                            <p class="card-text">
+                                <strong>Prix:</strong> @vehicule.PrixParJour.ToString("C") / jour<br />
+                                <strong>Type:</strong> @vehicule.TypeVehicule?.Libelle
+                            </p>
+                            <span class="badge bg-success">Disponible</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary" @onclick="VoirVehicules">
+                Voir tous les véhicules
+            </button>
+        </div>
+    }
+</div>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 0;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .brand {
+        font-weight: 300;
+    }
+
+    .brand strong {
+        color: #ffd700;
+    }
+
+    .lead {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .vehicle-card {
+        transition: transform 0.3s;
+        height: 100%;
+    }
+
+    .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private List<Vehicule> vehicules;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allVehicules = await VehiculeService.GetAllAsync();
+        vehicules = allVehicules.Where(v => v.Disponible).ToList();
+    }
+
+    private void VoirVehicules()
+    {
+        Navigation.NavigateTo("/vehicules");
+    }
+}

@@ -1,0 +1,91 @@
+﻿<Window x:Class="rntlOS.BackOffice.Views.ModifierBookingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Modifier la réservation" 
+        Height="400" 
+        Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Titre -->
+        <TextBlock Text="Modifier la réservation" 
+                   Foreground="White"
+                   FontSize="20" 
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <!-- Formulaire -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,10,0">
+
+                <TextBlock Text="Client" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtClient" 
+                           Text="" 
+                           Padding="8"
+                           Background="#F0F0F0"
+                           Margin="0,0,0,10"/>
+
+                <TextBlock Text="Véhicule" FontWeight="SemiBold"/>
+                <TextBlock x:Name="TxtVehicule" 
+                           Text="" 
+                           Padding="8"
+                           Background="#F0F0F0"
+                           Margin="0,0,0,10"/>
+
+                <TextBlock Text="Date de début" FontWeight="SemiBold"/>
+                <DatePicker x:Name="DtpDateDebut" 
+                            Padding="8" 
+                            Margin="0,0,0,10"/>
+
+                <TextBlock Text="Date de fin" FontWeight="SemiBold"/>
+                <DatePicker x:Name="DtpDateFin" 
+                            Padding="8" 
+                            Margin="0,0,0,10"/>
+
+                <TextBlock Text="Prix Total (MAD)" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtPrixTotal" 
+                         Padding="8" 
+                         Margin="0,0,0,10"/>
+
+                <TextBlock Text="Statut" FontWeight="SemiBold"/>
+                <ComboBox x:Name="CmbStatut" 
+                          Padding="8"
+                          Margin="0,0,0,10">
+                    <ComboBoxItem Content="En Attente"/>
+                    <ComboBoxItem Content="Confirmée"/>
+                    <ComboBoxItem Content="Annulée"/>
+                    <ComboBoxItem Content="Terminée"/>
+                </ComboBox>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Boutons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+
+            <Button Content="Annuler" 
+                    Click="Annuler_Click"
+                    Width="100"
+                    Padding="10"
+                    Margin="0,0,10,0"/>
+
+            <Button Content="Enregistrer" 
+                    Click="Enregistrer_Click"
+                    Background="#007ACC"
+                    Foreground="White"
+                    Width="100"
+                    Padding="10"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

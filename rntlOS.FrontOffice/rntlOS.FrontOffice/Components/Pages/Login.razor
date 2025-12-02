@@ -1,0 +1,54 @@
+﻿@page "/login"
+@using rntlOS.Core.Services
+@inject ClientService ClientService
+@inject NavigationManager Navigation
+
+<h3>Connexion</h3>
+
+<div class="card p-4" style="max-width:400px;margin:auto;">
+    <div class="mb-3">
+        <label>Email</label>
+        <input class="form-control" @bind="email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Mot de passe</label>
+        <input class="form-control" type="password" @bind="password" />
+    </div>
+
+    <button class="btn btn-primary w-100" @onclick="HandleLogin">
+        Se connecter
+    </button>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string errorMessage = "";
+
+    private async Task HandleLogin()
+    {
+        var user = await ClientService.GetByEmailAsync(email);
+
+        if (user == null)
+        {
+            errorMessage = "Email incorrect.";
+            return;
+        }
+
+        // Vérification du mot de passe
+        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        {
+            errorMessage = "Mot de passe invalide.";
+            return;
+        }
+
+        // Connexion OK → redirection
+        Navigation.NavigateTo("/");
+    }
+}

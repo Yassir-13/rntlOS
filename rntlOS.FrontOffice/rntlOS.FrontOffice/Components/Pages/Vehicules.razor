@@ -1,0 +1,150 @@
+﻿@page "/vehicules"
+@using rntlOS.Core.Services
+@using rntlOS.Core.Models
+@inject VehiculeService VehiculeService
+@inject TypeVehiculeService TypeVehiculeService
+@inject NavigationManager Navigation
+
+<PageTitle>Nos véhicules - rntlOS</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Nos véhicules disponibles</h1>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Type de véhicule</label>
+                    <select class="form-select" @onchange="FiltrerParType">
+                        <option value="">Tous les types</option>
+                        @if (typesVehicules != null)
+                        {
+                            @foreach (var type in typesVehicules)
+                            {
+                                <option value="@type.Id">@type.Libelle</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Prix maximum par jour</label>
+                    <input type="number" class="form-control" @bind="prixMax" @bind:event="oninput" @onchange="AppliquerFiltres" placeholder="Prix max" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-secondary w-100" @onclick="ReinitialiserFiltres">
+                        Réinitialiser
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (vehiculesFiltres == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+    }
+    else if (!vehiculesFiltres.Any())
+    {
+        <div class="alert alert-info">
+            Aucun véhicule ne correspond à vos critères.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var vehicule in vehiculesFiltres)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card vehicle-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@vehicule.Marque @vehicule.Modele</h5>
+                            <p class="card-text">
+                                <strong>Type:</strong> @vehicule.TypeVehicule?.Libelle<br />
+                                <strong>Prix:</strong> @vehicule.PrixParJour.ToString("C") / jour<br />
+                                <strong>Kilométrage:</strong> @vehicule.Kilometrage.ToString("N0") km<br />
+                            </p>
+                            <span class="badge bg-success">Disponible</span>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary w-100" @onclick="() => ReserverVehicule(vehicule.Id)">
+                                Réserver maintenant
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .vehicle-card {
+        transition: transform 0.3s;
+    }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+</style>
+
+@code {
+    private List<Vehicule> tousVehicules;
+    private List<Vehicule> vehiculesFiltres;
+    private List<TypeVehicule> typesVehicules;
+    private int? typeSelectionne;
+    private decimal? prixMax;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var all = await VehiculeService.GetAllAsync();
+        tousVehicules = all.Where(v => v.Disponible).ToList();
+        vehiculesFiltres = tousVehicules;
+        typesVehicules = await TypeVehiculeService.GetAllAsync();
+    }
+
+    private void FiltrerParType(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int typeId))
+        {
+            typeSelectionne = typeId;
+        }
+        else
+        {
+            typeSelectionne = null;
+        }
+        AppliquerFiltres();
+    }
+
+    private void AppliquerFiltres()
+    {
+        vehiculesFiltres = tousVehicules;
+
+        if (typeSelectionne.HasValue)
+        {
+            vehiculesFiltres = vehiculesFiltres.Where(v => v.TypeVehiculeId == typeSelectionne.Value).ToList();
+        }
+
+        if (prixMax.HasValue)
+        {
+            vehiculesFiltres = vehiculesFiltres.Where(v => v.PrixParJour <= prixMax.Value).ToList();
+        }
+    }
+
+    private void ReinitialiserFiltres()
+    {
+        typeSelectionne = null;
+        prixMax = null;
+        vehiculesFiltres = tousVehicules;
+    }
+
+    private void ReserverVehicule(int vehiculeId)
+    {
+        Navigation.NavigateTo($"/reserver/{vehiculeId}");
+    }
+}

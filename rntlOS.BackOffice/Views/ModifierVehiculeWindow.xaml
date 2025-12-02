@@ -1,0 +1,81 @@
+﻿<Window x:Class="rntlOS.BackOffice.Views.ModifierVehiculeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Modifier un véhicule" 
+        Height="600" 
+        Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Titre -->
+        <TextBlock Text="Modifier le véhicule" 
+                   Foreground="White"
+                   FontSize="20" 
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <!-- Formulaire avec ScrollViewer -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="0,0,10,0">
+
+                <TextBlock Text="Marque" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtMarque" Padding="8" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Modèle" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtModele" Padding="8" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Matricule" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtMatricule" Padding="8" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Prix par jour (MAD)" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtPrixParJour" Padding="8" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Type de véhicule" FontWeight="SemiBold"/>
+                <ComboBox x:Name="CmbTypeVehicule" 
+                          DisplayMemberPath="Libelle" 
+                          SelectedValuePath="Id"
+                          Padding="8"
+                          Margin="0,0,0,10"/>
+
+                <TextBlock Text="Kilométrage" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtKilometrage" Padding="8" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Date de mise en service" FontWeight="SemiBold"/>
+                <DatePicker x:Name="DtpDateMiseEnService" Padding="8" Margin="0,0,0,10"/>
+
+                <CheckBox x:Name="ChkDisponible" 
+                          Content="Véhicule disponible" 
+                          Margin="0,0,0,10"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Boutons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+
+            <Button Content="Annuler" 
+                    Click="Annuler_Click"
+                    Width="100"
+                    Padding="10"
+                    Margin="0,0,10,0"/>
+
+            <Button Content="Enregistrer" 
+                    Click="Enregistrer_Click"
+                    Background="#007ACC"
+                    Foreground="White"
+                    Width="100"
+                    Padding="10"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
