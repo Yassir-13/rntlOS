@@ -18,7 +18,7 @@
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Véhicules disponibles</h2>
-
+    
     @if (vehicules == null)
     {
         <div class="text-center">
@@ -43,7 +43,7 @@
                         <div class="card-body">
                             <h5 class="card-title">@vehicule.Marque @vehicule.Modele</h5>
                             <p class="card-text">
-                                <strong>Prix:</strong> @vehicule.PrixParJour.ToString("C") / jour<br />
+                                <strong>Prix:</strong> @vehicule.PrixParJour.ToString("C") / jour<br/>
                                 <strong>Type:</strong> @vehicule.TypeVehicule?.Libelle
                             </p>
                             <span class="badge bg-success">Disponible</span>
@@ -52,7 +52,7 @@
                 </div>
             }
         </div>
-
+        
         <div class="text-center mt-4">
             <button class="btn btn-outline-primary" @onclick="VoirVehicules">
                 Voir tous les véhicules
@@ -68,30 +68,30 @@
         padding: 100px 0;
         text-align: center;
     }
-
+    
     .hero-content h1 {
         font-size: 3rem;
         margin-bottom: 1rem;
     }
-
+    
     .brand {
         font-weight: 300;
     }
-
+    
     .brand strong {
         color: #ffd700;
     }
-
+    
     .lead {
         font-size: 1.5rem;
         margin-bottom: 2rem;
     }
-
+    
     .vehicle-card {
         transition: transform 0.3s;
         height: 100%;
     }
-
+    
     .vehicle-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);

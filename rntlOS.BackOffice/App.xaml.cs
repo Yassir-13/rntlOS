@@ -56,6 +56,9 @@ namespace rntlOS.BackOffice
             services.AddTransient<AjouterPaiementWindow>();
             services.AddTransient<ModifierPaiementWindow>();
             services.AddTransient<LoginWindow>();
+            services.AddScoped<VehiculeImageService>();
+            services.AddTransient<GererImagesWindow>();
+            services.AddScoped<ExcelExportService>();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

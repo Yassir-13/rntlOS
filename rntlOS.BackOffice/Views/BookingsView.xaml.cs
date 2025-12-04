@@ -1,10 +1,14 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using rntlOS.Core.Models;
 using rntlOS.Core.Services;
+using rntlOS.Core.PdfService;
 
 namespace rntlOS.BackOffice.Views
 {
@@ -103,6 +107,55 @@ namespace rntlOS.BackOffice.Views
             if (window.ShowDialog() == true)
             {
                 MessageBox.Show("Paiement enregistré !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        // ← AJOUTEZ CETTE MÉTHODE
+        private async void GenererPdf_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var booking = button?.DataContext as Booking;
+
+            if (booking == null) return;
+
+            try
+            {
+                // Recharger la réservation complète avec les relations
+                var bookingComplet = await _bookingService.GetByIdAsync(booking.Id);
+
+                if (bookingComplet == null)
+                {
+                    MessageBox.Show("Impossible de charger les détails de la réservation.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                // Générer le PDF
+                var pdfService = new ReservationPdfService();
+                var pdfBytes = pdfService.GeneratePdf(bookingComplet);
+
+                // Demander où enregistrer le fichier
+                var saveDialog = new SaveFileDialog
+                {
+                    Filter = "PDF files (*.pdf)|*.pdf",
+                    FileName = $"Reservation_{bookingComplet.Id}_{DateTime.Now:yyyyMMdd}.pdf"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    File.WriteAllBytes(saveDialog.FileName, pdfBytes);
+                    MessageBox.Show("PDF généré avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    // Ouvrir le PDF
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de la génération du PDF : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

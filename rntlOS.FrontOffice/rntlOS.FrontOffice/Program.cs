@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using rntlOS.Core.Data;
 using rntlOS.Core.Services;
+using rntlOS.FrontOffice.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 // Ajouter le DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -29,9 +30,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting();
+app.UseAntiforgery();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

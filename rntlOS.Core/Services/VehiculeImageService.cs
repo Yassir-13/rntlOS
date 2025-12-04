@@ -15,39 +15,40 @@ namespace rntlOS.Core.Services
             _context = context;
         }
 
-        // Récupérer toutes les images
         public async Task<List<VehiculeImage>> GetAllAsync()
         {
             return await _context.VehiculeImages
-                .Include(i => i.Vehicule)
+                .Include(vi => vi.Vehicule)
                 .ToListAsync();
         }
 
-        // Récupérer les images d’un seul véhicule
-        public async Task<List<VehiculeImage>> GetByVehiculeIdAsync(int vehiculeId)
+        public async Task<VehiculeImage> GetByIdAsync(int id)
         {
             return await _context.VehiculeImages
-                .Where(i => i.VehiculeId == vehiculeId)
-                .ToListAsync();
+                .Include(vi => vi.Vehicule)
+                .FirstOrDefaultAsync(vi => vi.Id == id);
         }
 
-        // Ajouter une image
-        public async Task<VehiculeImage> AddAsync(VehiculeImage image)
+        public async Task AddAsync(VehiculeImage image)
         {
             _context.VehiculeImages.Add(image);
             await _context.SaveChangesAsync();
-            return image;
         }
 
-        // Supprimer une image
-        public async Task<bool> DeleteAsync(int id)
+        public async Task UpdateAsync(VehiculeImage image)
         {
-            var img = await _context.VehiculeImages.FirstOrDefaultAsync(i => i.Id == id);
-            if (img == null) return false;
-
-            _context.VehiculeImages.Remove(img);
+            _context.VehiculeImages.Update(image);
             await _context.SaveChangesAsync();
-            return true;
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var image = await _context.VehiculeImages.FindAsync(id);
+            if (image != null)
+            {
+                _context.VehiculeImages.Remove(image);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

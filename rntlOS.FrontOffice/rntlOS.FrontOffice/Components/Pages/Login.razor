@@ -1,54 +1,209 @@
 ﻿@page "/login"
 @using rntlOS.Core.Services
+@using rntlOS.Core.Models
+@using BCryptLib = BCrypt.Net.BCrypt
 @inject ClientService ClientService
 @inject NavigationManager Navigation
 
-<h3>Connexion</h3>
+<PageTitle>Connexion - rntlOS</PageTitle>
 
-<div class="card p-4" style="max-width:400px;margin:auto;">
-    <div class="mb-3">
-        <label>Email</label>
-        <input class="form-control" @bind="email" />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>@(modeInscription ? "Inscription" : "Connexion")</h3>
+                </div>
+                <div class="card-body">
+
+                    @if (!string.IsNullOrEmpty(messageErreur))
+                    {
+                        <div class="alert alert-danger">@messageErreur</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(messageSucces))
+                    {
+                        <div class="alert alert-success">@messageSucces</div>
+                    }
+
+                    <EditForm Model="@loginModel" OnValidSubmit="@HandleSubmit">
+                        <DataAnnotationsValidator />
+
+                        @if (modeInscription)
+                        {
+                            <div class="mb-3">
+                                <label>Nom</label>
+                                <InputText class="form-control" @bind-Value="loginModel.Nom" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Prénom</label>
+                                <InputText class="form-control" @bind-Value="loginModel.Prenom" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Téléphone</label>
+                                <InputText class="form-control" @bind-Value="loginModel.Telephone" />
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <InputText type="email" class="form-control" @bind-Value="loginModel.Email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Mot de passe</label>
+                            <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
+                        </div>
+
+                        @if (modeInscription)
+                        {
+                            <div class="mb-3">
+                                <label>Confirmer le mot de passe</label>
+                                <InputText type="password" class="form-control" @bind-Value="loginModel.ConfirmPassword" />
+                            </div>
+                        }
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            @(modeInscription ? "S'inscrire" : "Se connecter")
+                        </button>
+                    </EditForm>
+
+                    <div class="text-center">
+                        <button class="btn btn-link" @onclick="ChangerMode">
+                            @(modeInscription ? "Déjà un compte ? Se connecter" : "Pas de compte ? S'inscrire")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label>Mot de passe</label>
-        <input class="form-control" type="password" @bind="password" />
-    </div>
-
-    <button class="btn btn-primary w-100" @onclick="HandleLogin">
-        Se connecter
-    </button>
-
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger mt-3">@errorMessage</div>
-    }
 </div>
 
 @code {
-    private string email = "";
-    private string password = "";
-    private string errorMessage = "";
+    private LoginModel loginModel = new();
+    private bool modeInscription = false;
+    private string messageErreur = "";
+    private string messageSucces = "";
 
-    private async Task HandleLogin()
+    private async Task HandleSubmit()
     {
-        var user = await ClientService.GetByEmailAsync(email);
+        messageErreur = "";
+        messageSucces = "";
 
-        if (user == null)
+        if (modeInscription)
         {
-            errorMessage = "Email incorrect.";
+            await Inscription();
+        }
+        else
+        {
+            await Connexion();
+        }
+    }
+
+    private async Task Inscription()
+    {
+        // Validation
+        if (string.IsNullOrWhiteSpace(loginModel.Nom) ||
+            string.IsNullOrWhiteSpace(loginModel.Prenom) ||
+            string.IsNullOrWhiteSpace(loginModel.Email) ||
+            string.IsNullOrWhiteSpace(loginModel.Password))
+        {
+            messageErreur = "Veuillez remplir tous les champs.";
             return;
         }
 
-        // Vérification du mot de passe
-        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+        if (loginModel.Password != loginModel.ConfirmPassword)
         {
-            errorMessage = "Mot de passe invalide.";
+            messageErreur = "Les mots de passe ne correspondent pas.";
             return;
         }
 
-        // Connexion OK → redirection
+        if (loginModel.Password.Length < 6)
+        {
+            messageErreur = "Le mot de passe doit contenir au moins 6 caractères.";
+            return;
+        }
+
+        // Vérifier si l'email existe déjà
+        var clients = await ClientService.GetAllAsync();
+        if (clients.Any(c => c.Email.ToLower() == loginModel.Email.ToLower()))
+        {
+            messageErreur = "Cet email est déjà utilisé.";
+            return;
+        }
+
+        // Créer le client
+        var client = new Client
+        {
+            Nom = loginModel.Nom,
+            Prenom = loginModel.Prenom,
+            Email = loginModel.Email.ToLower(),
+            Telephone = loginModel.Telephone,
+            PasswordHash = BCryptLib.HashPassword(loginModel.Password)
+        };
+
+        try
+        {
+            await ClientService.AddAsync(client);
+            messageSucces = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
+            modeInscription = false;
+            loginModel = new();
+        }
+        catch (Exception ex)
+        {
+            messageErreur = $"Erreur lors de l'inscription : {ex.Message}";
+        }
+    }
+
+    private async Task Connexion()
+    {
+        if (string.IsNullOrWhiteSpace(loginModel.Email) ||
+            string.IsNullOrWhiteSpace(loginModel.Password))
+        {
+            messageErreur = "Veuillez remplir tous les champs.";
+            return;
+        }
+
+        var clients = await ClientService.GetAllAsync();
+        var client = clients.FirstOrDefault(c => c.Email.ToLower() == loginModel.Email.ToLower());
+
+        if (client == null)
+        {
+            messageErreur = "Email ou mot de passe incorrect.";
+            return;
+        }
+
+        if (!BCryptLib.Verify(loginModel.Password, client.PasswordHash))
+        {
+            messageErreur = "Email ou mot de passe incorrect.";
+            return;
+        }
+
+        // Connexion réussie
+        messageSucces = "Connexion réussie !";
+
+        // Rediriger vers la page d'accueil après 1 seconde
+        await Task.Delay(1000);
         Navigation.NavigateTo("/");
+    }
+
+    private void ChangerMode()
+    {
+        modeInscription = !modeInscription;
+        messageErreur = "";
+        messageSucces = "";
+        loginModel = new();
+    }
+
+    public class LoginModel
+    {
+        public string Nom { get; set; } = "";
+        public string Prenom { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Telephone { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string ConfirmPassword { get; set; } = "";
     }
 }
