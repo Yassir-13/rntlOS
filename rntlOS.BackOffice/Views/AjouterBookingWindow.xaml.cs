@@ -120,17 +120,22 @@ namespace rntlOS.BackOffice.Views
                 Status = statut
             };
 
+            await _bookingService.AddAsync(booking);
+
+            // Envoyer email de confirmation
             try
             {
-                await _bookingService.AddAsync(booking);
-                MessageBox.Show("Réservation créée avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
-                DialogResult = true;
-                Close();
+                var emailService = new EmailService();
+                await emailService.EnvoyerEmailConfirmationReservation(booking);
+                MessageBox.Show("Réservation créée et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors de la création : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Réservation créée mais erreur email : {ex.Message}", "Attention", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+
+            DialogResult = true;
+            Close();
         }
 
         private void Annuler_Click(object sender, RoutedEventArgs e)

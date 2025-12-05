@@ -103,10 +103,10 @@
                         <Button Content="Réservations" Click="OpenReservations" Style="{StaticResource MenuButtonStyle}"/>
                         <Button Content="Paiements" Click="OpenPaiements" Style="{StaticResource MenuButtonStyle}"/>
 
-                        <TextBlock Text="ADMINISTRATION" FontSize="11" Foreground="#555560" FontWeight="Bold" Margin="10,20,0,10"/>
+                        <TextBlock x:Name="TxtAdministration" Text="ADMINISTRATION" FontSize="11" Foreground="#555560" FontWeight="Bold" Margin="10,20,0,10"/>
 
-                        <Button Content="Employés" Click="OpenEmployees" Style="{StaticResource MenuButtonStyle}"/>
-                        <Button Content="Maintenance" Click="OpenMaintenance" Style="{StaticResource MenuButtonStyle}"/>
+                        <Button x:Name="BtnEmployes" Content="Employés" Click="OpenEmployees" Style="{StaticResource MenuButtonStyle}"/>
+                        <Button x:Name="BtnMaintenance" Content="Maintenance" Click="OpenMaintenance" Style="{StaticResource MenuButtonStyle}"/>
                     </StackPanel>
                 </ScrollViewer>
 

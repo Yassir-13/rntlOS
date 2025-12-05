@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
+using rntlOS.Core.Models;
+using rntlOS.Core.Services;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Extensions.DependencyInjection;
-using rntlOS.Core.Models;
-using rntlOS.Core.Services;
+using System.IO;
+using Microsoft.Win32;
 
 namespace rntlOS.BackOffice.Views
 {
@@ -90,6 +93,39 @@ namespace rntlOS.BackOffice.Views
                 {
                     MessageBox.Show($"Erreur lors de la suppression : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+            }
+        }
+
+        private async void ExporterExcel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var excelService = _serviceProvider.GetRequiredService<ExcelExportService>();
+                var paiements = await _paiementService.GetAllAsync();
+
+                var excelBytes = excelService.ExportPaiements(paiements);
+
+                var saveDialog = new SaveFileDialog
+                {
+                    Filter = "Excel files (*.xlsx)|*.xlsx",
+                    FileName = $"Paiements_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    File.WriteAllBytes(saveDialog.FileName, excelBytes);
+                    MessageBox.Show("Export Excel réussi !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de l'export : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

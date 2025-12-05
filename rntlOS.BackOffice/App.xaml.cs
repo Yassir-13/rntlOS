@@ -59,6 +59,7 @@ namespace rntlOS.BackOffice
             services.AddScoped<VehiculeImageService>();
             services.AddTransient<GererImagesWindow>();
             services.AddScoped<ExcelExportService>();
+            services.AddScoped<EmailService>();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

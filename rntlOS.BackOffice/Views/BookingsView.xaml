@@ -16,23 +16,25 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
-        <!-- Bouton Ajouter -->
         <!-- Boutons Ajouter et Export -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
             <Button Content="+ Nouvelle réservation"
-                    Click="AjouterReservation_Click"
-                    Background="#007ACC"
-                    Foreground="White"
-                    Padding="15,8"
-                    FontSize="14"
-                    Margin="0,0,0,10"
-                    Cursor="Hand"/>
+            Click="AjouterReservation_Click"
+            Background="#007ACC"
+            Foreground="White"
+            Padding="15,8"
+            FontSize="14"
+            HorizontalAlignment="Left"
+            Margin="0,0,10,0"
+            Cursor="Hand"/>
+
             <Button Content="📊 Exporter Excel"
             Click="ExporterExcel_Click"
             Background="#28A745"
             Foreground="White"
             Padding="15,8"
             FontSize="14"
+            HorizontalAlignment="Left"
             Cursor="Hand"/>
         </StackPanel>
 

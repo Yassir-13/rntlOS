@@ -1,7 +1,8 @@
-﻿using System;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using rntlOS.BackOffice.Views;
+using System;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace rntlOS.BackOffice
 {
@@ -13,7 +14,6 @@ namespace rntlOS.BackOffice
         {
             InitializeComponent();
             _provider = provider;
-
             Loaded += MainWindow_Loaded;
         }
 
@@ -21,9 +21,30 @@ namespace rntlOS.BackOffice
         {
             // Afficher les infos de l'utilisateur connecté
             TxtUserName.Text = UserSession.UserName;
-            TxtUserRole.Text = UserSession.UserRole;
+            TxtUserRole.Text = UserSession.UserRole == "Admin" ? "Administrateur" : "Employé";
 
+            // Configurer le menu selon le rôle
+            ConfigurerMenuSelonRole();
+
+            // Ouvrir le dashboard par défaut
             OpenDashboard(null, null);
+        }
+
+        private void ConfigurerMenuSelonRole()
+        {
+            // Récupérer les boutons du menu
+            var employesButton = FindName("BtnEmployes") as Button;
+            var maintenanceButton = FindName("BtnMaintenance") as Button;
+
+            // Si l'utilisateur n'est pas Admin, masquer les sections administration
+            if (UserSession.UserRole != "Admin")
+            {
+                if (employesButton != null)
+                    employesButton.Visibility = Visibility.Collapsed;
+
+                if (maintenanceButton != null)
+                    maintenanceButton.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void OpenDashboard(object sender, RoutedEventArgs e)
@@ -62,6 +83,12 @@ namespace rntlOS.BackOffice
             MainContent.Content = view;
         }
 
+        private void OpenPaiements(object sender, RoutedEventArgs e)
+        {
+            var view = _provider.GetRequiredService<PaiementsView>();
+            MainContent.Content = view;
+        }
+
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
@@ -73,17 +100,10 @@ namespace rntlOS.BackOffice
             if (result == MessageBoxResult.Yes)
             {
                 UserSession.Logout();
-
                 // Redémarrer l'application
                 System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
                 Application.Current.Shutdown();
             }
-        }
-
-        private void OpenPaiements(object sender, RoutedEventArgs e)
-        {
-            var view = _provider.GetRequiredService<PaiementsView>();
-            MainContent.Content = view;
         }
     }
 }

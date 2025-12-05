@@ -158,5 +158,38 @@ namespace rntlOS.BackOffice.Views
                 MessageBox.Show($"Erreur lors de la génération du PDF : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private async void ExporterExcel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var excelService = _serviceProvider.GetRequiredService<ExcelExportService>();
+                var bookings = await _bookingService.GetAllAsync();
+
+                var excelBytes = excelService.ExportReservations(bookings);
+
+                var saveDialog = new SaveFileDialog
+                {
+                    Filter = "Excel files (*.xlsx)|*.xlsx",
+                    FileName = $"Reservations_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                {
+                    File.WriteAllBytes(saveDialog.FileName, excelBytes);
+                    MessageBox.Show("Export Excel réussi !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de l'export : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

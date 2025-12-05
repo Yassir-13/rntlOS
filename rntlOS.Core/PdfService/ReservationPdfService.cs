@@ -3,6 +3,7 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QRCoder;
 using rntlOS.Core.Models;
+using System.IO;
 
 namespace rntlOS.Core.PdfService
 {
@@ -29,7 +30,8 @@ namespace rntlOS.Core.PdfService
                             column.Item().Text("Bon de Réservation").FontSize(16).FontColor("#C9A961");
                         });
 
-                        row.ConstantItem(100).Height(100).Placeholder();
+                        // Logo - dimensions fixes et simples
+                        row.ConstantItem(100).Image(GetLogoBytes()).FitWidth();
                     });
 
                     // CONTENT
@@ -93,6 +95,26 @@ namespace rntlOS.Core.PdfService
             using (PngByteQRCode qrCode = new PngByteQRCode(qrCodeData))
             {
                 return qrCode.GetGraphic(20);
+            }
+        }
+
+        private byte[] GetLogoBytes()
+        {
+            try
+            {
+                string logoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "logo.png");
+
+                if (File.Exists(logoPath))
+                {
+                    return File.ReadAllBytes(logoPath);
+                }
+
+                // Si le logo n'existe pas, retourner un pixel transparent
+                return new byte[] { };
+            }
+            catch
+            {
+                return new byte[] { };
             }
         }
     }

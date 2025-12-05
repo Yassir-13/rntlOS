@@ -77,17 +77,25 @@ namespace rntlOS.BackOffice.Views
                 DatePaiement = DtpDatePaiement.SelectedDate.Value
             };
 
-            try
+            await _paiementService.AddAsync(paiement);
+
+            // Envoyer email si paiement réussi
+            if (paiement.Statut == StatutPaiement.Reussi)
             {
-                await _paiementService.AddAsync(paiement);
-                MessageBox.Show("Paiement enregistré avec succès !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
-                DialogResult = true;
-                Close();
+                try
+                {
+                    var emailService = new EmailService();
+                    await emailService.EnvoyerEmailConfirmationPaiement(paiement);
+                    MessageBox.Show("Paiement enregistré et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Paiement enregistré mais erreur email : {ex.Message}", "Attention", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur lors de l'enregistrement : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+
+            DialogResult = true;
+            Close();
         }
 
         private void Annuler_Click(object sender, RoutedEventArgs e)
