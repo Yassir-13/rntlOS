@@ -1,0 +1,161 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+<footer class="footer-premium">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Brand Section -->
+            <div class="col-md-6 mb-4 mb-md-0">
+                <a href="/" class="footer-brand mb-3 d-block">
+                    <span style="font-weight: 300;">rntl</span><strong style="color: #C9A961;">OS</strong>
+                </a>
+                <p class="footer-desc">
+                    L'excellence de la location de voitures de luxe. Une expérience incomparable, des véhicules d'exception.
+                </p>
+                <div class="social-links mt-4">
+                    <a href="#" class="social-link"><span class="oi oi-globe"></span></a>
+                    <a href="#" class="social-link"><span class="oi oi-envelope-closed"></span></a>
+                    <a href="#" class="social-link"><span class="oi oi-phone"></span></a>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-md-6">
+                <h5 class="footer-heading">Contact</h5>
+                <ul class="footer-contact">
+                    <li>
+                        <span class="oi oi-map-marker text-gold me-2"></span>
+                        Boulverad Abdelkrim Al khattabi, Marrakech
+                    </li>
+                    <li>
+                        <span class="oi oi-phone text-gold me-2"></span>
+                        +212 6 55 55 55 55
+                    </li>
+                    <li>
+                        <span class="oi oi-envelope-closed text-gold me-2"></span>
+                        contact@rntlos.com
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="footer-divider" />
+
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="copyright mb-0">
+                    &copy; @DateTime.Now.Year rntlOS. Tous droits réservés.
+                </p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <div class="footer-legal">
+                    <a href="#">Mentions Légales</a>
+                    <span class="mx-2">|</span>
+                    <a href="#">CGU</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer-premium {
+        background: linear-gradient(180deg, #0B1A2E 0%, #000000 100%);
+        color: rgba(255, 255, 255, 0.7);
+        padding: 60px 0 30px;
+        position: relative;
+        border-top: 3px solid #C9A961;
+        margin-top: auto;
+    }
+
+    .footer-brand {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2rem;
+        color: white;
+        text-decoration: none;
+        letter-spacing: 2px;
+    }
+
+    .footer-desc {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        max-width: 400px;
+    }
+
+    .footer-heading {
+        color: #C9A961;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .footer-heading::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 40px;
+        height: 2px;
+        background: #C9A961;
+    }
+
+    .footer-contact {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-contact li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+
+    .text-gold {
+        color: #C9A961;
+    }
+
+    .social-links {
+        display: flex;
+        gap: 15px;
+    }
+
+    .social-link {
+        width: 35px;
+        height: 35px;
+        border: 1px solid rgba(201, 169, 97, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #C9A961;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    .social-link:hover {
+        background: #C9A961;
+        color: #0B1A2E;
+        transform: translateY(-3px);
+    }
+
+    .footer-divider {
+        border-color: rgba(201, 169, 97, 0.2);
+        margin: 40px 0 20px;
+    }
+
+    .copyright {
+        font-size: 0.85rem;
+    }
+
+    .footer-legal a {
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: color 0.3s;
+    }
+
+    .footer-legal a:hover {
+        color: #C9A961;
+    }
+</style>

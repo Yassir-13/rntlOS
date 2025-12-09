@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using rntlOS.Core.Services
 @using rntlOS.Core.Models
+@using System.IO
 @inject VehiculeService VehiculeService
 @inject NavigationManager Navigation
 
@@ -8,105 +9,180 @@
 
 <div class="hero-section">
     <div class="hero-content">
-        <h1>Bienvenue chez <span class="brand">rntl<strong>OS</strong></span></h1>
+        <h1 class="animated-title">Bienvenue chez <span class="brand">rntl<strong>OS</strong></span></h1>
         <p class="lead">Louez votre véhicule en quelques clics</p>
-        <button class="btn btn-primary btn-lg" @onclick="VoirVehicules">
-            Voir nos véhicules disponibles
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Véhicules Premium</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">24/7</span>
+                <span class="stat-label">Service Client</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Satisfaction</span>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-lg hero-cta" @onclick="VoirVehicules">
+            <span class="oi oi-bolt"></span> Voir nos véhicules disponibles
         </button>
     </div>
 </div>
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Véhicules disponibles</h2>
-    
-    @if (vehicules == null)
-    {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Chargement...</span>
-            </div>
-        </div>
-    }
-    else if (!vehicules.Any())
-    {
-        <div class="alert alert-info">
-            Aucun véhicule disponible pour le moment.
-        </div>
-    }
-    else
-    {
-        <div class="row">
-            @foreach (var vehicule in vehicules.Take(6))
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="card vehicle-card">
-                        <div class="card-body">
-                            <h5 class="card-title">@vehicule.Marque @vehicule.Modele</h5>
-                            <p class="card-text">
-                                <strong>Prix:</strong> @vehicule.PrixParJour.ToString("C") / jour<br/>
-                                <strong>Type:</strong> @vehicule.TypeVehicule?.Libelle
-                            </p>
-                            <span class="badge bg-success">Disponible</span>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-        
-        <div class="text-center mt-4">
-            <button class="btn btn-outline-primary" @onclick="VoirVehicules">
-                Voir tous les véhicules
-            </button>
-        </div>
-    }
-</div>
+
 
 <style>
+    /* ========== HERO SECTION PREMIUM ========== */
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0B1A2E 0%, #000000 100%);
         color: white;
-        padding: 100px 0;
+        padding: 120px 0 80px;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 5px solid #C9A961;
     }
-    
-    .hero-content h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(201, 169, 97, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 60s linear infinite;
+        }
+
+    @@keyframes moveBackground {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
     }
-    
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+        .hero-content h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 3px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+    @@keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .brand {
         font-weight: 300;
+        color: white;
     }
-    
-    .brand strong {
-        color: #ffd700;
-    }
-    
+
+        .brand strong {
+            color: #C9A961;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(201, 169, 97, 0.5);
+        }
+
     .lead {
         font-size: 1.5rem;
-        margin-bottom: 2rem;
+        margin-bottom: 3rem;
+        font-weight: 300;
+        letter-spacing: 2px;
+        opacity: 0.95;
+        animation: fadeIn 1.2s ease-out;
     }
-    
-    .vehicle-card {
-        transition: transform 0.3s;
-        height: 100%;
+
+    /* ========== HERO STATS ========== */
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        margin: 3rem 0;
+        animation: fadeInUp 1.5s ease-out;
     }
-    
-    .vehicle-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-number {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #C9A961;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 0.5rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    .stat-divider {
+        width: 2px;
+        height: 50px;
+        background: linear-gradient(180deg, transparent, #C9A961, transparent);
+    }
+
+    .hero-cta {
+        animation: fadeInUp 1.8s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+    /* ========== RESPONSIVE ========== */
+    @@media(max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+
+        .hero-stats {
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .stat-divider {
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #C9A961, transparent);
+        }
     }
 </style>
 
 @code {
-    private List<Vehicule> vehicules;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var allVehicules = await VehiculeService.GetAllAsync();
-        vehicules = allVehicules.Where(v => v.Disponible).ToList();
-    }
-
     private void VoirVehicules()
     {
         Navigation.NavigateTo("/vehicules");

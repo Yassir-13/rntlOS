@@ -15,7 +15,6 @@ namespace rntlOS.BackOffice.Views
             InitializeComponent();
             _bookingService = bookingService;
             _booking = booking;
-
             Loaded += ModifierBookingWindow_Loaded;
         }
 
@@ -63,6 +62,15 @@ namespace rntlOS.BackOffice.Views
             if (dateFin < dateDebut)
             {
                 MessageBox.Show("La date de fin doit être supérieure ou égale à la date de début.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // VÉRIFIER LA DISPONIBILITÉ (en excluant la réservation actuelle)
+            bool estDisponible = await _bookingService.VehiculeEstDisponible(_booking.VehiculeId, dateDebut, dateFin, _booking.Id);
+
+            if (!estDisponible)
+            {
+                MessageBox.Show("Ce véhicule est déjà réservé pour ces dates. Veuillez choisir d'autres dates.", "Véhicule non disponible", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

@@ -48,20 +48,23 @@ namespace rntlOS.BackOffice.Views
             {
                 try
                 {
-                    // Créer le dossier Images s'il n'existe pas
-                    string imagesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images");
-                    Directory.CreateDirectory(imagesFolder);
+                    // Chemin vers le dossier wwwroot du Front-office
+                    string projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
+                    string frontOfficeWwwroot = Path.Combine(projectRoot, "rntlOS.FrontOffice", "rntlOS.FrontOffice", "wwwroot", "Images");
 
-                    // Copier l'image dans le dossier
+                    // Créer le dossier s'il n'existe pas
+                    Directory.CreateDirectory(frontOfficeWwwroot);
+
+                    // Copier l'image dans wwwroot
                     string fileName = $"{_vehicule.Id}_{Guid.NewGuid()}{Path.GetExtension(openDialog.FileName)}";
-                    string destinationPath = Path.Combine(imagesFolder, fileName);
+                    string destinationPath = Path.Combine(frontOfficeWwwroot, fileName);
                     File.Copy(openDialog.FileName, destinationPath, true);
 
-                    // Enregistrer dans la base de données
+                    // Enregistrer dans la base de données (sauvegarder juste le nom du fichier)
                     var image = new VehiculeImage
                     {
                         VehiculeId = _vehicule.Id,
-                        ImagePath = destinationPath
+                        ImagePath = fileName  // Juste le nom du fichier, pas le chemin complet
                     };
 
                     await _imageService.AddAsync(image);
@@ -95,10 +98,15 @@ namespace rntlOS.BackOffice.Views
             {
                 try
                 {
+                    // Construire le chemin complet pour supprimer
+                    string projectRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\"));
+                    string frontOfficeWwwroot = Path.Combine(projectRoot, "rntlOS.FrontOffice", "rntlOS.FrontOffice", "wwwroot", "Images");
+                    string fullPath = Path.Combine(frontOfficeWwwroot, selectedImage.ImagePath);
+
                     // Supprimer le fichier
-                    if (File.Exists(selectedImage.ImagePath))
+                    if (File.Exists(fullPath))
                     {
-                        File.Delete(selectedImage.ImagePath);
+                        File.Delete(fullPath);
                     }
 
                     // Supprimer de la base de données

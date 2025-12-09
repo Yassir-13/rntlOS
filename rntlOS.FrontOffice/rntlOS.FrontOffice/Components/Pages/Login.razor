@@ -1,18 +1,21 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
 @using rntlOS.Core.Services
 @using rntlOS.Core.Models
+@using rntlOS.FrontOffice.Services
 @using BCryptLib = BCrypt.Net.BCrypt
 @inject ClientService ClientService
+@inject AuthenticationStateService AuthService
 @inject NavigationManager Navigation
 
 <PageTitle>Connexion - rntlOS</PageTitle>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div>
             <div class="card">
                 <div class="card-header text-center">
-                    <h3>@(modeInscription ? "Inscription" : "Connexion")</h3>
+                    <h3>Connexion</h3>
                 </div>
                 <div class="card-body">
 
@@ -26,26 +29,8 @@
                         <div class="alert alert-success">@messageSucces</div>
                     }
 
-                    <EditForm Model="@loginModel" OnValidSubmit="@HandleSubmit">
+                    <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
                         <DataAnnotationsValidator />
-
-                        @if (modeInscription)
-                        {
-                            <div class="mb-3">
-                                <label>Nom</label>
-                                <InputText class="form-control" @bind-Value="loginModel.Nom" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Prénom</label>
-                                <InputText class="form-control" @bind-Value="loginModel.Prenom" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label>Téléphone</label>
-                                <InputText class="form-control" @bind-Value="loginModel.Telephone" />
-                            </div>
-                        }
 
                         <div class="mb-3">
                             <label>Email</label>
@@ -57,23 +42,15 @@
                             <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
                         </div>
 
-                        @if (modeInscription)
-                        {
-                            <div class="mb-3">
-                                <label>Confirmer le mot de passe</label>
-                                <InputText type="password" class="form-control" @bind-Value="loginModel.ConfirmPassword" />
-                            </div>
-                        }
-
                         <button type="submit" class="btn btn-primary w-100 mb-3">
-                            @(modeInscription ? "S'inscrire" : "Se connecter")
+                            Se connecter
                         </button>
                     </EditForm>
 
                     <div class="text-center">
-                        <button class="btn btn-link" @onclick="ChangerMode">
-                            @(modeInscription ? "Déjà un compte ? Se connecter" : "Pas de compte ? S'inscrire")
-                        </button>
+                        <a href="/register" class="btn btn-link">
+                            Pas de compte ? S'inscrire
+                        </a>
                     </div>
                 </div>
             </div>
@@ -83,82 +60,14 @@
 
 @code {
     private LoginModel loginModel = new();
-    private bool modeInscription = false;
     private string messageErreur = "";
     private string messageSucces = "";
 
-    private async Task HandleSubmit()
+    private async Task HandleLogin()
     {
         messageErreur = "";
         messageSucces = "";
 
-        if (modeInscription)
-        {
-            await Inscription();
-        }
-        else
-        {
-            await Connexion();
-        }
-    }
-
-    private async Task Inscription()
-    {
-        // Validation
-        if (string.IsNullOrWhiteSpace(loginModel.Nom) ||
-            string.IsNullOrWhiteSpace(loginModel.Prenom) ||
-            string.IsNullOrWhiteSpace(loginModel.Email) ||
-            string.IsNullOrWhiteSpace(loginModel.Password))
-        {
-            messageErreur = "Veuillez remplir tous les champs.";
-            return;
-        }
-
-        if (loginModel.Password != loginModel.ConfirmPassword)
-        {
-            messageErreur = "Les mots de passe ne correspondent pas.";
-            return;
-        }
-
-        if (loginModel.Password.Length < 6)
-        {
-            messageErreur = "Le mot de passe doit contenir au moins 6 caractères.";
-            return;
-        }
-
-        // Vérifier si l'email existe déjà
-        var clients = await ClientService.GetAllAsync();
-        if (clients.Any(c => c.Email.ToLower() == loginModel.Email.ToLower()))
-        {
-            messageErreur = "Cet email est déjà utilisé.";
-            return;
-        }
-
-        // Créer le client
-        var client = new Client
-        {
-            Nom = loginModel.Nom,
-            Prenom = loginModel.Prenom,
-            Email = loginModel.Email.ToLower(),
-            Telephone = loginModel.Telephone,
-            PasswordHash = BCryptLib.HashPassword(loginModel.Password)
-        };
-
-        try
-        {
-            await ClientService.AddAsync(client);
-            messageSucces = "Inscription réussie ! Vous pouvez maintenant vous connecter.";
-            modeInscription = false;
-            loginModel = new();
-        }
-        catch (Exception ex)
-        {
-            messageErreur = $"Erreur lors de l'inscription : {ex.Message}";
-        }
-    }
-
-    private async Task Connexion()
-    {
         if (string.IsNullOrWhiteSpace(loginModel.Email) ||
             string.IsNullOrWhiteSpace(loginModel.Password))
         {
@@ -181,29 +90,18 @@
             return;
         }
 
-        // Connexion réussie
-        messageSucces = "Connexion réussie !";
+        // Connexion réussie - Sauvegarder la session
+        AuthService.Login(client);
+        messageSucces = $"Bienvenue {client.Prenom} !";
 
         // Rediriger vers la page d'accueil après 1 seconde
         await Task.Delay(1000);
         Navigation.NavigateTo("/");
     }
 
-    private void ChangerMode()
-    {
-        modeInscription = !modeInscription;
-        messageErreur = "";
-        messageSucces = "";
-        loginModel = new();
-    }
-
     public class LoginModel
     {
-        public string Nom { get; set; } = "";
-        public string Prenom { get; set; } = "";
         public string Email { get; set; } = "";
-        public string Telephone { get; set; } = "";
         public string Password { get; set; } = "";
-        public string ConfirmPassword { get; set; } = "";
     }
 }

@@ -46,6 +46,9 @@ namespace rntlOS.Core.Services
         {
             _context.Paiements.Add(paiement);
             await _context.SaveChangesAsync();
+            
+            LogService.LogPaiementReceived(paiement.Montant, paiement.Methode.ToString(), paiement.BookingId);
+            
             return paiement;
         }
 

@@ -20,6 +20,7 @@ namespace rntlOS.Core.Services
         {
             return await _context.Vehicules
                 .Include(v => v.TypeVehicule)
+                .Include(v => v.Images)
                 .ToListAsync();
         }
 
@@ -28,6 +29,7 @@ namespace rntlOS.Core.Services
         {
             return await _context.Vehicules
                 .Include(v => v.TypeVehicule)
+                .Include(v => v.Images)
                 .FirstOrDefaultAsync(v => v.Id == id);
         }
 
@@ -36,6 +38,9 @@ namespace rntlOS.Core.Services
         {
             _context.Vehicules.Add(vehicule);
             await _context.SaveChangesAsync();
+            
+            LogService.LogVehiculeAdded(vehicule.Id, vehicule.Marque, vehicule.Modele);
+            
             return vehicule;
         }
 

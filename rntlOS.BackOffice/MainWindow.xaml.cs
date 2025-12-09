@@ -89,6 +89,12 @@ namespace rntlOS.BackOffice
             MainContent.Content = view;
         }
 
+        private void OpenLogs(object sender, RoutedEventArgs e)
+        {
+            var view = _provider.GetRequiredService<LogsView>();
+            MainContent.Content = view;
+        }
+
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(

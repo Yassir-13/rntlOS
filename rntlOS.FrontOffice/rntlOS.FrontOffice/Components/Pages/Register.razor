@@ -1,0 +1,155 @@
+@page "/register"
+@rendermode InteractiveServer
+@using rntlOS.Core.Services
+@using rntlOS.Core.Models
+@using BCryptLib = BCrypt.Net.BCrypt
+@inject ClientService ClientService
+@inject NavigationManager Navigation
+
+<PageTitle>Inscription - rntlOS</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div>
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Créer un compte</h3>
+                </div>
+                <div class="card-body">
+
+                    @if (!string.IsNullOrEmpty(messageErreur))
+                    {
+                        <div class="alert alert-danger">@messageErreur</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(messageSucces))
+                    {
+                        <div class="alert alert-success">@messageSucces</div>
+                    }
+
+                    <EditForm Model="@registerModel" OnValidSubmit="@HandleRegister">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label>Nom</label>
+                            <InputText class="form-control" @bind-Value="registerModel.Nom" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Prénom</label>
+                            <InputText class="form-control" @bind-Value="registerModel.Prenom" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <InputText type="email" class="form-control" @bind-Value="registerModel.Email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Téléphone</label>
+                            <InputText class="form-control" @bind-Value="registerModel.Telephone" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Mot de passe</label>
+                            <InputText type="password" class="form-control" @bind-Value="registerModel.Password" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Confirmer le mot de passe</label>
+                            <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmPassword" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            S'inscrire
+                        </button>
+                    </EditForm>
+
+                    <div class="text-center">
+                        <a href="/login" class="btn btn-link">
+                            Déjà un compte ? Se connecter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private RegisterModel registerModel = new();
+    private string messageErreur = "";
+    private string messageSucces = "";
+
+    private async Task HandleRegister()
+    {
+        messageErreur = "";
+        messageSucces = "";
+
+        // Validation
+        if (string.IsNullOrWhiteSpace(registerModel.Nom) ||
+            string.IsNullOrWhiteSpace(registerModel.Prenom) ||
+            string.IsNullOrWhiteSpace(registerModel.Email) ||
+            string.IsNullOrWhiteSpace(registerModel.Password))
+        {
+            messageErreur = "Veuillez remplir tous les champs.";
+            return;
+        }
+
+        if (registerModel.Password != registerModel.ConfirmPassword)
+        {
+            messageErreur = "Les mots de passe ne correspondent pas.";
+            return;
+        }
+
+        if (registerModel.Password.Length < 6)
+        {
+            messageErreur = "Le mot de passe doit contenir au moins 6 caractères.";
+            return;
+        }
+
+        // Vérifier si l'email existe déjà
+        var clients = await ClientService.GetAllAsync();
+        if (clients.Any(c => c.Email.ToLower() == registerModel.Email.ToLower()))
+        {
+            messageErreur = "Cet email est déjà utilisé.";
+            return;
+        }
+
+        // Créer le client
+        var client = new Client
+        {
+            Nom = registerModel.Nom,
+            Prenom = registerModel.Prenom,
+            Email = registerModel.Email.ToLower(),
+            Telephone = registerModel.Telephone,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerModel.Password)
+        };
+
+        try
+        {
+            await ClientService.AddAsync(client);
+            messageSucces = "Inscription réussie ! Redirection vers la connexion...";
+            
+            // Rediriger vers login après 2 secondes
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            messageErreur = $"Erreur lors de l'inscription : {ex.Message}";
+        }
+    }
+
+    public class RegisterModel
+    {
+        public string Nom { get; set; } = "";
+        public string Prenom { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Telephone { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

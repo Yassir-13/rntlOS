@@ -1,0 +1,185 @@
+@page "/mes-reservations"
+@rendermode InteractiveServer
+@using rntlOS.Core.Services
+@using rntlOS.Core.Models
+@using rntlOS.FrontOffice.Services
+@inject BookingService BookingService
+@inject AuthenticationStateService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Mes Réservations - rntlOS</PageTitle>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Mes Réservations</h2>
+
+    @if (!AuthService.IsAuthenticated)
+    {
+        <div class="alert alert-warning">
+            <p>Vous devez être connecté pour voir vos réservations.</p>
+            <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/login"))">
+                Se connecter
+            </button>
+        </div>
+    }
+    else if (reservations == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+        </div>
+    }
+    else if (!reservations.Any())
+    {
+        <div class="alert alert-info">
+            <h4>Aucune réservation</h4>
+            <p>Vous n'avez pas encore effectué de réservation.</p>
+            <button class="btn btn-primary" @onclick="@(() => Navigation.NavigateTo("/vehicules"))">
+                Découvrir nos véhicules
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var booking in reservations.OrderByDescending(b => b.CreatedAt))
+            {
+                <div class="col-md-12 mb-4">
+                    <div class="card booking-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">Réservation</h5>
+                                <small class="text-muted">Créée le @booking.CreatedAt.ToString("dd/MM/yyyy à HH:mm")</small>
+                            </div>
+                            <span class="badge @GetStatutBadgeClass(booking.Status)">
+                                @GetStatutText(booking.Status)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Vehicle Info -->
+                                <div class="col-md-3">
+                                    @if (booking.Vehicule?.Images?.Any() == true)
+                                    {
+                                        <img src="/Images/@booking.Vehicule.Images.First().ImagePath" 
+                                             class="img-fluid rounded" 
+                                             alt="@booking.Vehicule.Marque @booking.Vehicule.Modele" />
+                                    }
+                                    else
+                                    {
+                                        <div class="no-image-placeholder">
+                                            <span class="oi oi-image"></span>
+                                        </div>
+                                    }
+                                </div>
+                                
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <!-- Vehicle Details -->
+                                        <div class="col-md-4">
+                                            <h6 class="text-muted">Véhicule</h6>
+                                            <p class="mb-1"><strong>@booking.Vehicule?.Marque @booking.Vehicule?.Modele</strong></p>
+                                            <p class="mb-0 text-muted small">@booking.Vehicule?.TypeVehicule?.Libelle</p>
+                                        </div>
+
+                                        <!-- Dates -->
+                                        <div class="col-md-4">
+                                            <h6 class="text-muted">Période</h6>
+                                            <p class="mb-1">
+                                                <span class="oi oi-calendar"></span>
+                                                Du @booking.DateDebut.ToString("dd/MM/yyyy")
+                                            </p>
+                                            <p class="mb-0">
+                                                <span class="oi oi-calendar"></span>
+                                                Au @booking.DateFin.ToString("dd/MM/yyyy")
+                                            </p>
+                                            <p class="mb-0 text-muted small">
+                                                (@((booking.DateFin - booking.DateDebut).Days) jour(s))
+                                            </p>
+                                        </div>
+
+                                        <!-- Price & Actions -->
+                                        <div class="col-md-4">
+                                            <h6 class="text-muted">Prix Total</h6>
+                                            <p class="h4 text-success mb-3">@booking.PrixTotal.ToString("C")</p>
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    @onclick="@(() => VoirDetails(booking.Id))">
+                                                <span class="oi oi-eye"></span> Voir détails
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Booking>? reservations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthService.IsAuthenticated && AuthService.CurrentUser != null)
+        {
+            reservations = await BookingService.GetByClientIdAsync(AuthService.CurrentUser.Id);
+        }
+    }
+
+    private string GetStatutText(StatutReservation statut)
+    {
+        return statut switch
+        {
+            StatutReservation.EnAttente => "En attente",
+            StatutReservation.Confirmee => "Confirmée",
+            StatutReservation.Annulee => "Annulée",
+            StatutReservation.Terminee => "Terminée",
+            _ => "Inconnu"
+        };
+    }
+
+    private string GetStatutBadgeClass(StatutReservation statut)
+    {
+        return statut switch
+        {
+            StatutReservation.EnAttente => "bg-warning",
+            StatutReservation.Confirmee => "bg-success",
+            StatutReservation.Annulee => "bg-danger",
+            StatutReservation.Terminee => "bg-secondary",
+            _ => "bg-secondary"
+        };
+    }
+
+    private void VoirDetails(int bookingId)
+    {
+        Navigation.NavigateTo($"/confirmation?bookingId={bookingId}");
+    }
+}
+
+<style>
+    .booking-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .booking-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .no-image-placeholder {
+        background: #f0f0f0;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .no-image-placeholder .oi {
+        font-size: 3rem;
+        color: #ccc;
+    }
+</style>

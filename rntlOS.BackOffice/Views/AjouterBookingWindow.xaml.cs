@@ -95,6 +95,19 @@ namespace rntlOS.BackOffice.Views
                 return;
             }
 
+            // Récupérer les IDs
+            int clientId = (int)CmbClient.SelectedValue;
+            int vehiculeId = (int)CmbVehicule.SelectedValue;
+
+            // VÉRIFIER LA DISPONIBILITÉ
+            bool estDisponible = await _bookingService.VehiculeEstDisponible(vehiculeId, dateDebut, dateFin);
+
+            if (!estDisponible)
+            {
+                MessageBox.Show("Ce véhicule est déjà réservé pour ces dates. Veuillez choisir d'autres dates.", "Véhicule non disponible", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             // Calculer le prix total
             var nbJours = (dateFin - dateDebut).Days + 1;
             var prixTotal = nbJours * _prixParJour;
@@ -109,25 +122,35 @@ namespace rntlOS.BackOffice.Views
                 case 3: statut = StatutReservation.Terminee; break;
             }
 
-            // Créer la réservation
             var booking = new Booking
             {
-                ClientId = (int)CmbClient.SelectedValue,
-                VehiculeId = (int)CmbVehicule.SelectedValue,
+                ClientId = clientId,
+                VehiculeId = vehiculeId,
                 DateDebut = dateDebut,
                 DateFin = dateFin,
                 PrixTotal = prixTotal,
-                Status = statut
+                Status = statut,
+                CreatedAt = DateTime.Now
             };
 
             await _bookingService.AddAsync(booking);
 
+            // Recharger le booking avec ses relations pour l'email
+            var bookingComplet = await _bookingService.GetByIdAsync(booking.Id);
+
             // Envoyer email de confirmation
             try
             {
-                var emailService = new EmailService();
-                await emailService.EnvoyerEmailConfirmationReservation(booking);
-                MessageBox.Show("Réservation créée et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (bookingComplet != null)
+                {
+                    var emailService = new EmailService();
+                    await emailService.EnvoyerEmailConfirmationReservation(bookingComplet);
+                    MessageBox.Show("Réservation créée et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Réservation créée mais impossible de charger les détails pour l'email.", "Attention", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             catch (Exception ex)
             {

@@ -107,6 +107,7 @@
 
                         <Button x:Name="BtnEmployes" Content="Employés" Click="OpenEmployees" Style="{StaticResource MenuButtonStyle}"/>
                         <Button x:Name="BtnMaintenance" Content="Maintenance" Click="OpenMaintenance" Style="{StaticResource MenuButtonStyle}"/>
+                        <Button Content="Logs" Click="OpenLogs" Style="{StaticResource MenuButtonStyle}"/>
                     </StackPanel>
                 </ScrollViewer>
 

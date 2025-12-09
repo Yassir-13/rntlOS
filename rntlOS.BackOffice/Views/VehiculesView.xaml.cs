@@ -138,5 +138,46 @@ namespace rntlOS.BackOffice.Views
                 MessageBox.Show($"Erreur lors de l'export : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private async void ImporterExcel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var openDialog = new OpenFileDialog
+                {
+                    Filter = "Excel files (*.xlsx)|*.xlsx",
+                    Title = "Sélectionner un fichier Excel à importer"
+                };
+
+                if (openDialog.ShowDialog() == true)
+                {
+                    var importService = _serviceProvider.GetRequiredService<ExcelImportService>();
+                    var (successCount, errors) = await importService.ImportVehicules(openDialog.FileName);
+
+                    if (errors.Count == 0)
+                    {
+                        MessageBox.Show($"{successCount} véhicule(s) importé(s) avec succès!", 
+                            "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        var errorMessage = $"{successCount} véhicule(s) importé(s).\n\n{errors.Count} erreur(s):\n" + 
+                                          string.Join("\n", errors.Take(10));
+                        if (errors.Count > 10)
+                            errorMessage += $"\n... et {errors.Count - 10} autres erreurs";
+
+                        MessageBox.Show(errorMessage, "Import terminé avec erreurs", 
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+
+                    await LoadVehicles();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors de l'import : {ex.Message}", "Erreur", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

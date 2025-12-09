@@ -1,4 +1,8 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@rendermode InteractiveServer
+@using rntlOS.FrontOffice.Services
+@inject AuthenticationStateService AuthService
+@inject NavigationManager Navigation
+@implements IDisposable
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -19,75 +23,117 @@
             <span class="oi oi-list" aria-hidden="true"></span> Véhicules
         </NavLink>
     </div>
-    <div class="nav-item px-3">
-        <NavLink class="nav-link" href="login">
-            <span class="oi oi-person" aria-hidden="true"></span> Connexion
-        </NavLink>
-    </div>
+    
+    @if (AuthService?.IsAuthenticated == true)
+    {
+        <!-- USER CONNECTÉ -->
+        <div class="nav-item px-3 mt-4">
+            <div class="user-info">
+                <span class="oi oi-person user-icon"></span>
+                <div class="user-details">
+                    <div class="user-name">@AuthService.CurrentUser?.Prenom @AuthService.CurrentUser?.Nom</div>
+                    <div class="user-email">@AuthService.CurrentUser?.Email</div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="mes-reservations">
+                <span class="oi oi-calendar"></span> Mes réservations
+            </NavLink>
+        </div>
+        <div class="nav-item px-3 mt-3">
+            <button class="btn-logout w-100" @onclick="Logout">
+                <span class="oi oi-account-logout"></span> Déconnexion
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- NON CONNECTÉ -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="login">
+                <span class="oi oi-person" aria-hidden="true"></span> Connexion
+            </NavLink>
+        </div>
+    }
 </nav>
 
-<!-- TOGGLE DARK MODE -->
-<div class="theme-toggle-container">
-    <button class="theme-toggle-btn" @onclick="ToggleTheme">
-        @if (isDarkMode)
-        {
-            <span class="oi oi-sun"></span>
-            <span class="ms-2">Mode Clair</span>
-        }
-        else
-        {
-            <span class="oi oi-moon"></span>
-            <span class="ms-2">Mode Sombre</span>
-        }
-    </button>
-</div>
-
 <style>
-    .theme-toggle-container {
-        position: absolute;
-        bottom: 30px;
-        left: 0;
-        right: 0;
-        padding: 0 20px;
+    /* USER INFO */
+    .user-info {
+        background: rgba(201, 169, 97, 0.1);
+        border: 2px solid rgba(201, 169, 97, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
     }
 
-    .theme-toggle-btn {
-        width: 100%;
-        background: rgba(201, 169, 97, 0.1);
-        border: 2px solid #C9A961;
+    .user-icon {
+        font-size: 2rem;
         color: #C9A961;
+    }
+
+    .user-details {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #C9A961;
+        font-size: 0.95rem;
+        margin-bottom: 4px;
+    }
+
+    .user-email {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* LOGOUT BUTTON */
+    .btn-logout {
+        background: transparent;
+        border: 2px solid rgba(201, 169, 97, 0.3);
+        color: rgba(201, 169, 97, 0.9);
         padding: 12px 20px;
         border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s;
-        font-weight: 500;
-        letter-spacing: 1px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        letter-spacing: 1px;
     }
 
-        .theme-toggle-btn:hover {
-            background: #C9A961;
-            color: #0B1A2E;
+        .btn-logout:hover {
+            background: rgba(201, 169, 97, 0.15);
+            border-color: #C9A961;
+            color: #C9A961;
             transform: translateY(-2px);
         }
 </style>
 
 @code {
-    private bool isDarkMode = false;
-
-    private async Task ToggleTheme()
+    protected override void OnInitialized()
     {
-        isDarkMode = !isDarkMode;
+        AuthService.OnAuthStateChanged += StateHasChanged;
+    }
 
-        if (isDarkMode)
-        {
-            await JSRuntime.InvokeVoidAsync("eval", "document.body.classList.add('dark-mode')");
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("eval", "document.body.classList.remove('dark-mode')");
-        }
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= StateHasChanged;
     }
 }

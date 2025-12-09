@@ -1,54 +1,112 @@
-﻿using Microsoft.EntityFrameworkCore;
-using rntlOS.Core.Data;
-using rntlOS.Core.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Serilog;
+using Serilog.Events;
+using System;
+using System.IO;
 
 namespace rntlOS.Core.Services
 {
-    public class LogService
+    public static class LogService
     {
-        private readonly AppDbContext _context;
+        private static ILogger? _logger;
 
-        public LogService(AppDbContext context)
+        public static void InitializeLogger(string applicationName)
         {
-            _context = context;
+            var logsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+
+            _logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    path: Path.Combine(logsPath, $"{applicationName}_.log"),
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                    retainedFileCountLimit: 30)
+                .CreateLogger();
+
+            Log.Logger = _logger;
+
+            _logger.Information("═══════════════════════════════════════════════");
+            _logger.Information("{ApplicationName} démarré", applicationName);
+            _logger.Information("═══════════════════════════════════════════════");
         }
 
-        // Récupérer tous les logs
-        public async Task<List<Log>> GetAllAsync()
+        public static void LogInfo(string message, params object[] args)
         {
-            return await _context.Logs
-                .Include(l => l.User)
-                .ToListAsync();
+            _logger?.Information(message, args);
         }
 
-        // Récupérer les logs d’un utilisateur
-        public async Task<List<Log>> GetByUserIdAsync(int userId)
+        public static void LogWarning(string message, params object[] args)
         {
-            return await _context.Logs
-                .Where(l => l.UserId == userId)
-                .Include(l => l.User)
-                .ToListAsync();
+            _logger?.Warning(message, args);
         }
 
-        // Ajouter un log
-        public async Task<Log> AddAsync(Log log)
+        public static void LogError(string message, Exception? ex = null, params object[] args)
         {
-            _context.Logs.Add(log);
-            await _context.SaveChangesAsync();
-            return log;
+            if (ex != null)
+                _logger?.Error(ex, message, args);
+            else
+                _logger?.Error(message, args);
         }
 
-        // Supprimer un log
-        public async Task<bool> DeleteAsync(int id)
+        public static void LogDebug(string message, params object[] args)
         {
-            var log = await _context.Logs.FirstOrDefaultAsync(l => l.Id == id);
-            if (log == null) return false;
+            _logger?.Debug(message, args);
+        }
 
-            _context.Logs.Remove(log);
-            await _context.SaveChangesAsync();
-            return true;
+        // ACTIONS MÉTIER
+        public static void LogReservationCreated(int bookingId, string clientEmail, int vehiculeId)
+        {
+            _logger?.Information("RÉSERVATION CRÉÉE - ID: {BookingId}, Client: {ClientEmail}, Véhicule: {VehiculeId}", 
+                bookingId, clientEmail, vehiculeId);
+        }
+
+        public static void LogReservationModified(int bookingId, string modifiedBy)
+        {
+            _logger?.Information("RÉSERVATION MODIFIÉE - ID: {BookingId}, Par: {ModifiedBy}", 
+                bookingId, modifiedBy);
+        }
+
+        public static void LogReservationDeleted(int bookingId, string deletedBy)
+        {
+            _logger?.Warning("RÉSERVATION SUPPRIMÉE - ID: {BookingId}, Par: {DeletedBy}", 
+                bookingId, deletedBy);
+        }
+
+        public static void LogEmailSent(string recipientEmail, string subject)
+        {
+            _logger?.Information("EMAIL ENVOYÉ - Destinataire: {RecipientEmail}, Sujet: {Subject}", 
+                recipientEmail, subject);
+        }
+
+        public static void LogEmailFailed(string recipientEmail, Exception ex)
+        {
+            _logger?.Error(ex, "ÉCHEC ENVOI EMAIL - Destinataire: {RecipientEmail}", recipientEmail);
+        }
+
+        public static void LogLogin(string userEmail, bool success)
+        {
+            if (success)
+                _logger?.Information("CONNEXION RÉUSSIE - Utilisateur: {UserEmail}", userEmail);
+            else
+                _logger?.Warning("TENTATIVE CONNEXION ÉCHOUÉE - Utilisateur: {UserEmail}", userEmail);
+        }
+
+        public static void LogVehiculeAdded(int vehiculeId, string marque, string modele)
+        {
+            _logger?.Information("VÉHICULE AJOUTÉ - ID: {VehiculeId}, {Marque} {Modele}", 
+                vehiculeId, marque, modele);
+        }
+
+        public static void LogPaiementReceived(decimal montant, string methode, int bookingId)
+        {
+            _logger?.Information("PAIEMENT REÇU - Montant: {Montant:C}, Méthode: {Methode}, Réservation: {BookingId}", 
+                montant, methode, bookingId);
+        }
+
+        public static void Shutdown()
+        {
+            _logger?.Information("Application arrêtée");
+            Log.CloseAndFlush();
         }
     }
 }
