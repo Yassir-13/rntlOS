@@ -4,21 +4,21 @@
 @inject NavigationManager Navigation
 @implements IDisposable
 
-<div class="top-row ps-3 navbar navbar-dark">
+<div class="top-row ps-3 navbar">
     <div class="container-fluid">
         <a class="navbar-brand" href="">
-            <span style="font-weight: 300;">rntl</span><strong style="color: #C9A961;">OS</strong>
+            <span style="font-weight: 300; color: #fff;">rntl</span><strong style="color: var(--gold-primary);">OS</strong>
         </a>
     </div>
 </div>
 
 <nav class="flex-column">
-    <div class="nav-item px-3">
+    <div class="nav-item">
         <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
             <span class="oi oi-home" aria-hidden="true"></span> Accueil
         </NavLink>
     </div>
-    <div class="nav-item px-3">
+    <div class="nav-item">
         <NavLink class="nav-link" href="vehicules">
             <span class="oi oi-list" aria-hidden="true"></span> Véhicules
         </NavLink>
@@ -27,22 +27,24 @@
     @if (AuthService?.IsAuthenticated == true)
     {
         <!-- USER CONNECTÉ -->
-        <div class="nav-item px-3 mt-4">
+        <div class="nav-item mt-4">
             <div class="user-info">
-                <span class="oi oi-person user-icon"></span>
+                <div class="user-avatar">
+                   <span class="oi oi-person"></span>
+                </div>
                 <div class="user-details">
                     <div class="user-name">@AuthService.CurrentUser?.Prenom @AuthService.CurrentUser?.Nom</div>
                     <div class="user-email">@AuthService.CurrentUser?.Email</div>
                 </div>
             </div>
         </div>
-        <div class="nav-item px-3">
+        <div class="nav-item">
             <NavLink class="nav-link" href="mes-reservations">
                 <span class="oi oi-calendar"></span> Mes réservations
             </NavLink>
         </div>
-        <div class="nav-item px-3 mt-3">
-            <button class="btn-logout w-100" @onclick="Logout">
+        <div class="nav-item mt-2">
+            <button class="btn btn-logout w-100" @onclick="Logout">
                 <span class="oi oi-account-logout"></span> Déconnexion
             </button>
         </div>
@@ -50,75 +52,13 @@
     else
     {
         <!-- NON CONNECTÉ -->
-        <div class="nav-item px-3">
+        <div class="nav-item">
             <NavLink class="nav-link" href="login">
                 <span class="oi oi-person" aria-hidden="true"></span> Connexion
             </NavLink>
         </div>
     }
 </nav>
-
-<style>
-    /* USER INFO */
-    .user-info {
-        background: rgba(201, 169, 97, 0.1);
-        border: 2px solid rgba(201, 169, 97, 0.3);
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    .user-icon {
-        font-size: 2rem;
-        color: #C9A961;
-    }
-
-    .user-details {
-        flex: 1;
-    }
-
-    .user-name {
-        font-weight: 600;
-        color: #C9A961;
-        font-size: 0.95rem;
-        margin-bottom: 4px;
-    }
-
-    .user-email {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    /* LOGOUT BUTTON */
-    .btn-logout {
-        background: transparent;
-        border: 2px solid rgba(201, 169, 97, 0.3);
-        color: rgba(201, 169, 97, 0.9);
-        padding: 12px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        letter-spacing: 1px;
-    }
-
-        .btn-logout:hover {
-            background: rgba(201, 169, 97, 0.15);
-            border-color: #C9A961;
-            color: #C9A961;
-            transform: translateY(-2px);
-        }
-</style>
 
 @code {
     protected override void OnInitialized()
@@ -137,3 +77,4 @@
         AuthService.OnAuthStateChanged -= StateHasChanged;
     }
 }
+

@@ -3,12 +3,20 @@ using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using QRCoder;
 using rntlOS.Core.Models;
+using rntlOS.Core.Services;
 using System.IO;
 
 namespace rntlOS.Core.PdfService
 {
     public class ReservationPdfService
     {
+        private readonly IQrCodeService _qrCodeService;
+
+        public ReservationPdfService(IQrCodeService qrCodeService)
+        {
+            _qrCodeService = qrCodeService;
+        }
+
         public byte[] GeneratePdf(Booking booking)
         {
             QuestPDF.Settings.License = LicenseType.Community;
@@ -70,8 +78,9 @@ namespace rntlOS.Core.PdfService
 
                         column.Item().PaddingVertical(10);
 
+
                         // QR Code
-                        var qrCodeBytes = GenerateQrCode($"Réservation #{booking.Id} - {booking.Client.Nom} {booking.Client.Prenom}");
+                        var qrCodeBytes = _qrCodeService.GenerateBookingQrCode(booking);
                         column.Item().AlignCenter().Width(150).Image(qrCodeBytes);
                         column.Item().AlignCenter().Text("Scannez ce QR Code").FontSize(10).Italic();
                     });
@@ -88,15 +97,7 @@ namespace rntlOS.Core.PdfService
             return document.GeneratePdf();
         }
 
-        private byte[] GenerateQrCode(string text)
-        {
-            using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
-            using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q))
-            using (PngByteQRCode qrCode = new PngByteQRCode(qrCodeData))
-            {
-                return qrCode.GetGraphic(20);
-            }
-        }
+
 
         private byte[] GetLogoBytes()
         {

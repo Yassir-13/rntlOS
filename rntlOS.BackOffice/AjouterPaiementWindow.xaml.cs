@@ -84,9 +84,14 @@ namespace rntlOS.BackOffice.Views
             {
                 try
                 {
-                    var emailService = new EmailService();
-                    await emailService.EnvoyerEmailConfirmationPaiement(paiement);
-                    MessageBox.Show("Paiement enregistré et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Reload payment with Booking and Client navigation properties
+                    var paiementWithBooking = await _paiementService.GetByIdAsync(paiement.Id);
+                    if (paiementWithBooking != null)
+                    {
+                        var emailService = new EmailService();
+                        await emailService.EnvoyerEmailConfirmationPaiement(paiementWithBooking);
+                        MessageBox.Show("Paiement enregistré et email de confirmation envoyé !", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                 }
                 catch (Exception ex)
                 {

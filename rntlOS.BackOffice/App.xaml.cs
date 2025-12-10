@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using rntlOS.BackOffice.Views;
 using rntlOS.Core.Data;
 using rntlOS.Core.Services;
+using rntlOS.Core.PdfService;
 using System;
 using System.Windows;
 using System.Globalization;
@@ -67,6 +68,8 @@ namespace rntlOS.BackOffice
             services.AddScoped<ExcelExportService>();
             services.AddScoped<ExcelImportService>();
             services.AddScoped<EmailService>();
+            services.AddScoped<IQrCodeService, QrCodeService>();
+            services.AddScoped<ReservationPdfService>();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

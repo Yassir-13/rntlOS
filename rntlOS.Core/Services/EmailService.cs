@@ -126,7 +126,7 @@ namespace rntlOS.Core.Services
                 <style>
                     body {{ font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }}
                     .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }}
-                    .header {{ background: linear-gradient(135deg, #0B1A2E 0%, #000000 100%); color: white; padding: 30px; text-align: center; border-bottom: 4px solid #C9A961; }}
+                    .header {{ background: linear-gradient(135deg, #bebebeff 0%, #7e7a7aff 100%); color: white; padding: 30px; text-align: center; border-bottom: 4px solid #C9A961; }}
                     .content {{ padding: 30px; }}
                     .info-box {{ background: #f8f9fa; border-left: 4px solid #C9A961; padding: 15px; margin: 20px 0; }}
                     .total {{ background: #C9A961; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0; border-radius: 8px; }}
@@ -144,14 +144,14 @@ namespace rntlOS.Core.Services
                         <p>Nous avons le plaisir de confirmer votre réservation :</p>
                         
                         <div class='info-box'>
-                            <h3 style='margin-top: 0; color: #0B1A2E;'>📋 Réservation N° {booking.Id}</h3>
+                            <h3 style='margin-top: 0; color: #0B1A2E;'>Réservation :</h3>
                             <p><strong>Date de début :</strong> {booking.DateDebut:dd/MM/yyyy}</p>
                             <p><strong>Date de fin :</strong> {booking.DateFin:dd/MM/yyyy}</p>
                             <p><strong>Durée :</strong> {(booking.DateFin - booking.DateDebut).Days + 1} jour(s)</p>
                         </div>
                         
                         <div class='info-box'>
-                            <h3 style='margin-top: 0; color: #0B1A2E;'>🚗 Véhicule loué</h3>
+                            <h3 style='margin-top: 0; color: #0B1A2E;'>Véhicule loué</h3>
                             <p><strong>Marque :</strong> {booking.Vehicule.Marque}</p>
                             <p><strong>Modèle :</strong> {booking.Vehicule.Modele}</p>
                             <p><strong>Matricule :</strong> {booking.Vehicule.Matricule}</p>

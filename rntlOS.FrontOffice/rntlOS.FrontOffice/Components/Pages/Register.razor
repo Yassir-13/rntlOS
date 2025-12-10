@@ -10,66 +10,72 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div>
-            <div class="card">
-                <div class="card-header text-center">
-                    <h3>Créer un compte</h3>
+        <div class="col-md-7 col-lg-6" style="min-width: 320px;">
+            <div class="glass-panel p-4 p-md-5 mb-5">
+                <div class="text-center mb-4">
+                    <span class="oi oi-pencil" style="font-size: 3rem; color: var(--gold-primary);"></span>
+                    <h3 class="text-gold mt-3">Devenir Membre</h3>
+                    <p class="text-dim">Rejoignez le cercle exclusif rntlOS.</p>
                 </div>
-                <div class="card-body">
 
-                    @if (!string.IsNullOrEmpty(messageErreur))
-                    {
-                        <div class="alert alert-danger">@messageErreur</div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(messageSucces))
-                    {
-                        <div class="alert alert-success">@messageSucces</div>
-                    }
-
-                    <EditForm Model="@registerModel" OnValidSubmit="@HandleRegister">
-                        <DataAnnotationsValidator />
-
-                        <div class="mb-3">
-                            <label>Nom</label>
-                            <InputText class="form-control" @bind-Value="registerModel.Nom" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Prénom</label>
-                            <InputText class="form-control" @bind-Value="registerModel.Prenom" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <InputText type="email" class="form-control" @bind-Value="registerModel.Email" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Téléphone</label>
-                            <InputText class="form-control" @bind-Value="registerModel.Telephone" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Mot de passe</label>
-                            <InputText type="password" class="form-control" @bind-Value="registerModel.Password" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Confirmer le mot de passe</label>
-                            <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmPassword" />
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mb-3">
-                            S'inscrire
-                        </button>
-                    </EditForm>
-
-                    <div class="text-center">
-                        <a href="/login" class="btn btn-link">
-                            Déjà un compte ? Se connecter
-                        </a>
+                @if (!string.IsNullOrEmpty(messageErreur))
+                {
+                    <div class="alert alert-danger">
+                        <span class="oi oi-warning me-2"></span> @messageErreur
                     </div>
+                }
+
+                @if (!string.IsNullOrEmpty(messageSucces))
+                {
+                    <div class="alert alert-success">
+                        <span class="oi oi-check me-2"></span> @messageSucces
+                    </div>
+                }
+
+                <EditForm Model="@registerModel" OnValidSubmit="@HandleRegister">
+                    <DataAnnotationsValidator />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Nom</label>
+                            <InputText class="form-control" @bind-Value="registerModel.Nom" placeholder="Votre nom" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">Prénom</label>
+                            <InputText class="form-control" @bind-Value="registerModel.Prenom" placeholder="Votre prénom" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Email</label>
+                        <InputText type="email" class="form-control" @bind-Value="registerModel.Email" placeholder="votre@email.com" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Téléphone</label>
+                        <InputText class="form-control" @bind-Value="registerModel.Telephone" placeholder="+33 6 00 00 00 00" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Mot de passe</label>
+                        <InputText type="password" class="form-control" @bind-Value="registerModel.Password" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white">Confirmer le mot de passe</label>
+                        <InputText type="password" class="form-control" @bind-Value="registerModel.ConfirmPassword" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3 btn-lg">
+                        S'inscrire
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-3">
+                    <p class="text-dim mb-0">Déjà membre ?</p>
+                    <a href="/login" class="text-gold text-decoration-none fw-bold">
+                        Accéder à mon espace
+                    </a>
                 </div>
             </div>
         </div>

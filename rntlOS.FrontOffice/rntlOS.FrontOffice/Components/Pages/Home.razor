@@ -5,63 +5,20 @@
 @inject VehiculeService VehiculeService
 @inject NavigationManager Navigation
 
-<PageTitle>rntlOS - Location de voitures</PageTitle>
+<PageTitle>rntlOS - Location de voitures de Prestige</PageTitle>
 
 <div class="hero-section">
     <div class="hero-content">
-        <h1 class="animated-title">Bienvenue chez <span class="brand">rntl<strong>OS</strong></span></h1>
-        <p class="lead">Louez votre véhicule en quelques clics</p>
-        <div class="hero-stats">
-            <div class="stat-item">
-                <span class="stat-number">50+</span>
-                <span class="stat-label">Véhicules Premium</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-number">24/7</span>
-                <span class="stat-label">Service Client</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-                <span class="stat-number">100%</span>
-                <span class="stat-label">Satisfaction</span>
-            </div>
-        </div>
-        <button class="btn btn-primary btn-lg hero-cta" @onclick="VoirVehicules">
-            <span class="oi oi-bolt"></span> Voir nos véhicules disponibles
-        </button>
-    </div>
-</div>
-
-
-
-<style>
-    /* ========== HERO SECTION PREMIUM ========== */
+        <h1 class="animated-title">Bienvenue chez <span class="brand">rntl<strong class="brand-highlight">OS</strong></span></h1>
+        <p class="lead">L'élégance à chaque kilomètre. Louez l'exceptionnel.</p><style>
+    /* ========== HERO SECTION PREMIUM (LIGHT EARTH) ========== */
     .hero-section {
-        background: linear-gradient(135deg, #0B1A2E 0%, #000000 100%);
-        color: white;
+        background: transparent; /* allow body gradient to show */
         padding: 120px 0 80px;
         text-align: center;
         position: relative;
         overflow: hidden;
-        border-bottom: 5px solid #C9A961;
-    }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(201, 169, 97, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: moveBackground 60s linear infinite;
-        }
-
-    @@keyframes moveBackground {
-        0% { transform: translate(0, 0); }
-        100% { transform: translate(50px, 50px); }
+        border-bottom: 1px solid #c7bfad;
     }
 
     .hero-content {
@@ -69,44 +26,27 @@
         z-index: 1;
     }
 
-        .hero-content h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 4.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            letter-spacing: 3px;
-            animation: fadeInDown 1s ease-out;
-        }
-
-    @@keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .hero-content h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 4.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        letter-spacing: 2px;
+        color: #635345; /* Kabul */
     }
 
-    .brand {
-        font-weight: 300;
-        color: white;
+    .brand { font-weight: 300; color: #635345; }
+    .brand-highlight { 
+        color: #835f49; /* Roman Coffee */
+        text-shadow: none;
     }
-
-        .brand strong {
-            color: #C9A961;
-            font-weight: 700;
-            text-shadow: 0 0 20px rgba(201, 169, 97, 0.5);
-        }
 
     .lead {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         margin-bottom: 3rem;
-        font-weight: 300;
-        letter-spacing: 2px;
-        opacity: 0.95;
-        animation: fadeIn 1.2s ease-out;
+        color: #8d7d6d; /* Makara */
+        font-weight: 400;
+        letter-spacing: 1px;
     }
 
     /* ========== HERO STATS ========== */
@@ -114,9 +54,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 2rem;
+        gap: 3rem;
         margin: 3rem 0;
-        animation: fadeInUp 1.5s ease-out;
     }
 
     .stat-item {
@@ -128,59 +67,94 @@
     .stat-number {
         font-family: 'Cormorant Garamond', serif;
         font-size: 3rem;
-        font-weight: 700;
-        color: #C9A961;
+        font-weight: 600;
+        color: #835f49; /* Roman Coffee */
         line-height: 1;
     }
 
     .stat-label {
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.85rem;
+        color: #8d7d6d; /* Makara */
         margin-top: 0.5rem;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         text-transform: uppercase;
+        font-weight: 600;
     }
 
     .stat-divider {
-        width: 2px;
+        width: 1px;
         height: 50px;
-        background: linear-gradient(180deg, transparent, #C9A961, transparent);
+        background: #c7bfad;
     }
-
-    .hero-cta {
-        animation: fadeInUp 1.8s ease-out;
-    }
-
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
 
     /* ========== RESPONSIVE ========== */
     @@media(max-width: 768px) {
-        .hero-content h1 {
-            font-size: 2.5rem;
-        }
-
-        .hero-stats {
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .stat-divider {
-            width: 50px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #C9A961, transparent);
-        }
+        .hero-content h1 { font-size: 2.5rem; }
+        .hero-stats { flex-direction: column; gap: 2rem; }
+        .stat-divider { display: none; }
     }
 </style>
+        
+        <div class="hero-stats">
+            <div class="stat-item">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Véhicules Premium</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">24/7</span>
+                <span class="stat-label">Conciergerie</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Excellence</span>
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg mt-4" @onclick="VoirVehicules">
+            <span class="oi oi-arrow-right" style="margin-right: 10px;"></span> Découvrir la Collection
+        </button>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2>Pourquoi nous choisir ?</h2>
+            <p class="text-dim">Une expérience de location sans compromis.</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-gold"><span class="oi oi-star"></span></h3>
+                    <h4>Qualité Premium</h4>
+                    <p class="text-dim">Des véhicules méticuleusement entretenus pour votre confort absolu.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-gold"><span class="oi oi-clock"></span></h3>
+                    <h4>Disponibilité Immédiate</h4>
+                    <p class="text-dim">Réservez en ligne et prenez la route en quelques minutes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h3 class="text-gold"><span class="oi oi-heart"></span></h3>
+                    <h4>Service Sur-mesure</h4>
+                    <p class="text-dim">Une équipe dédiée pour répondre à vos moindres exigences.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private void VoirVehicules()

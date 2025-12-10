@@ -130,7 +130,7 @@ namespace rntlOS.BackOffice.Views
                 }
 
                 // Générer le PDF
-                var pdfService = new ReservationPdfService();
+                var pdfService = _serviceProvider.GetRequiredService<ReservationPdfService>();
                 var pdfBytes = pdfService.GeneratePdf(bookingComplet);
 
                 // Demander où enregistrer le fichier

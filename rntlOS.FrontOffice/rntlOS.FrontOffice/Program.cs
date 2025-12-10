@@ -23,6 +23,7 @@ builder.Services.AddScoped<TypeVehiculeService>();
 builder.Services.AddScoped<BookingService>();
 builder.Services.AddScoped<rntlOS.FrontOffice.Services.AuthenticationStateService>();
 builder.Services.AddScoped<rntlOS.Core.PdfService.ReservationPdfService>();
+builder.Services.AddScoped<IQrCodeService, QrCodeService>();
 
 // EmailService avec configuration SMTP
 builder.Services.AddSingleton(sp => new EmailService(

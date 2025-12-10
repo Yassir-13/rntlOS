@@ -14,8 +14,8 @@
 <div class="container mt-5">
     @if (vehicule == null)
     {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
+        <div class="text-center py-5">
+            <div class="spinner-border text-gold" role="status">
                 <span class="visually-hidden">Chargement...</span>
             </div>
         </div>
@@ -24,27 +24,31 @@
     {
         <div class="row">
             <!-- Véhicule Info -->
-            <div class="col-md-6">
-                <div class="card">
-                    @if (vehicule.Images?.Any() == true)
-                    {
-                        <img src="@GetImagePath(vehicule.Images.First().ImagePath)" 
-                             class="card-img-top" 
-                             alt="@vehicule.Marque @vehicule.Modele" />
-                    }
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="vehicle-image-container-res">
+                        @if (vehicule.Images?.Any() == true)
+                        {
+                            <img src="@GetImagePath(vehicule.Images.First().ImagePath)" 
+                                 class="vehicle-image-res" 
+                                 alt="@vehicule.Marque @vehicule.Modele" />
+                        }
+                    </div>
                     <div class="card-body">
                         <h3 class="card-title">@vehicule.Marque @vehicule.Modele</h3>
                         <p class="card-text">
-                            <span class="badge bg-primary">@vehicule.TypeVehicule?.Libelle</span>
+                            <span class="badge">@vehicule.TypeVehicule?.Libelle</span>
                         </p>
-                        <div class="vehicle-details">
-                            <div class="detail-item">
-                                <span class="oi oi-euro"></span>
-                                <strong>@vehicule.PrixParJour.ToString("C")</strong> / jour
+                        <div class="vehicle-details mt-4">
+                            <div class="detail-item d-flex align-items-center mb-3">
+                                <span class="oi oi-euro text-gold me-3 fs-5"></span>
+                                <div>
+                                    <strong class="text-gold fs-5">@vehicule.PrixParJour.ToString("C")</strong> <span class="text-dim">/ jour</span>
+                                </div>
                             </div>
-                            <div class="detail-item">
-                                <span class="oi oi-dashboard"></span>
-                                @vehicule.Kilometrage.ToString("N0") km
+                            <div class="detail-item d-flex align-items-center">
+                                <span class="oi oi-dashboard text-gold me-3 fs-5"></span>
+                                <span class="text-dim">@vehicule.Kilometrage.ToString("N0") km</span>
                             </div>
                         </div>
                     </div>
@@ -52,39 +56,49 @@
             </div>
 
             <!-- Formulaire Réservation -->
-            <div class="col-md-6">
-                <div class="card">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
                     <div class="card-header">
-                        <h4>Réservation</h4>
+                        <h4 class="mb-0">Votre Réservation</h4>
                     </div>
                     <div class="card-body">
                         @if (!string.IsNullOrEmpty(messageErreur))
                         {
-                            <div class="alert alert-danger">@messageErreur</div>
+                            <div class="alert alert-danger mb-3">
+                                <span class="oi oi-warning me-2"></span> @messageErreur
+                            </div>
                         }
 
                         @if (!string.IsNullOrEmpty(messageSucces))
                         {
-                            <div class="alert alert-success">@messageSucces</div>
+                            <div class="alert alert-success mb-3">
+                                <span class="oi oi-check me-2"></span> @messageSucces
+                            </div>
                         }
 
                         <EditForm Model="@reservationModel" OnValidSubmit="@CreerReservation">
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 <label class="form-label">Date de début</label>
                                 <InputDate class="form-control" @bind-Value="reservationModel.DateDebut" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                             </div>
 
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 <label class="form-label">Date de fin</label>
                                 <InputDate class="form-control" @bind-Value="reservationModel.DateFin" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
                             </div>
 
                             @if (nombreJours > 0 && prixTotal > 0)
                             {
-                                <div class="alert alert-info">
-                                    <h5>Récapitulatif</h5>
-                                    <p><strong>Durée:</strong> @nombreJours jour(s)</p>
-                                    <p><strong>Prix total:</strong> @prixTotal.ToString("C")</p>
+                                <div class="glass-panel p-3 mb-4 border-left-gold">
+                                    <h5 class="text-gold mb-3">Récapitulatif</h5>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-dim">Durée</span>
+                                        <strong class="text-white">@nombreJours jour(s)</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="text-dim">Total</span>
+                                        <strong class="text-gold fs-5">@prixTotal.ToString("C")</strong>
+                                    </div>
                                 </div>
                             }
 
@@ -93,7 +107,7 @@
                                 {
                                     <span class="spinner-border spinner-border-sm me-2"></span>
                                 }
-                                Confirmer la réservation
+                                <span class="oi oi-check me-2"></span> Confirmer la réservation
                             </button>
                         </EditForm>
                     </div>
@@ -102,6 +116,24 @@
         </div>
     }
 </div>
+
+<style>
+    .vehicle-image-container-res {
+        height: 300px;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .vehicle-image-res {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .border-left-gold {
+        border-left: 3px solid var(--gold-primary);
+    }
+</style>
 
 @code {
     [Parameter]
@@ -223,23 +255,3 @@
         public DateTime DateFin { get; set; } = DateTime.Today.AddDays(1);
     }
 }
-
-<style>
-    .vehicle-details {
-        margin-top: 1rem;
-    }
-
-    .detail-item {
-        padding: 0.5rem 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    .detail-item:last-child {
-        border-bottom: none;
-    }
-
-    .detail-item .oi {
-        margin-right: 0.5rem;
-        color: #C9A961;
-    }
-</style>

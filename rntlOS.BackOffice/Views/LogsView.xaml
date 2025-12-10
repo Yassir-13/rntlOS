@@ -9,7 +9,7 @@
         </Grid.RowDefinitions>
 
         <!-- Titre -->
-        <TextBlock Text="Fichiers Logs" 
+        <TextBlock Text="Fichiers Logs BackOffice" 
                    Foreground="White"
                    FontSize="24" 
                    FontWeight="Bold"

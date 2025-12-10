@@ -12,46 +12,57 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div>
-            <div class="card">
-                <div class="card-header text-center">
-                    <h3>Connexion</h3>
+        <div class="col-md-6 col-lg-5" style="min-width: 320px;">
+            <div class="glass-panel p-4 p-md-5">
+                <div class="text-center mb-4">
+                     <span class="oi oi-person" style="font-size: 3rem; color: var(--gold-primary);"></span>
+                    <h3 class="text-gold mt-3">Espace Membre</h3>
+                    <p class="text-dim">Connectez-vous pour accéder à vos privilèges.</p>
                 </div>
-                <div class="card-body">
 
-                    @if (!string.IsNullOrEmpty(messageErreur))
-                    {
-                        <div class="alert alert-danger">@messageErreur</div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(messageSucces))
-                    {
-                        <div class="alert alert-success">@messageSucces</div>
-                    }
-
-                    <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
-                        <DataAnnotationsValidator />
-
-                        <div class="mb-3">
-                            <label>Email</label>
-                            <InputText type="email" class="form-control" @bind-Value="loginModel.Email" />
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Mot de passe</label>
-                            <InputText type="password" class="form-control" @bind-Value="loginModel.Password" />
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 mb-3">
-                            Se connecter
-                        </button>
-                    </EditForm>
-
-                    <div class="text-center">
-                        <a href="/register" class="btn btn-link">
-                            Pas de compte ? S'inscrire
-                        </a>
+                @if (!string.IsNullOrEmpty(messageErreur))
+                {
+                    <div class="alert alert-danger">
+                        <span class="oi oi-warning me-2"></span> @messageErreur
                     </div>
+                }
+
+                @if (!string.IsNullOrEmpty(messageSucces))
+                {
+                    <div class="alert alert-success">
+                         <span class="oi oi-check me-2"></span> @messageSucces
+                    </div>
+                }
+
+                <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-4">
+                        <label class="form-label text-white">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0 text-gold"><span class="oi oi-envelope-closed"></span></span>
+                            <InputText type="email" class="form-control border-start-0 ps-0" @bind-Value="loginModel.Email" placeholder="votre@email.com" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white">Mot de passe</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-transparent border-end-0 text-gold"><span class="oi oi-key"></span></span>
+                            <InputText type="password" class="form-control border-start-0 ps-0" @bind-Value="loginModel.Password" placeholder="••••••••" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 mb-3 btn-lg">
+                        Se connecter
+                    </button>
+                </EditForm>
+
+                <div class="text-center mt-4">
+                    <p class="text-dim mb-0">Nouveau client ?</p>
+                    <a href="/register" class="text-gold text-decoration-none fw-bold">
+                        Créer un compte exclusif
+                    </a>
                 </div>
             </div>
         </div>

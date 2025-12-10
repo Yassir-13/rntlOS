@@ -7,45 +7,48 @@
 @inject TypeVehiculeService TypeVehiculeService
 @inject NavigationManager Navigation
 
-<PageTitle>Nos véhicules - rntlOS</PageTitle>
+<PageTitle>Collection Exclusive - rntlOS</PageTitle>
 
 <div class="container mt-4">
-    <h1 class="mb-4">Nos véhicules disponibles</h1>
+    <div class="row align-items-center mb-5">
+        <div class="col">
+            <h1 class="text-gold">Notre Flotte</h1>
+            <p class="text-dim">Découvrez notre collection de véhicules d'exception.</p>
+        </div>
+    </div>
 
-    <!-- Filtres -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <label>Type de véhicule</label>
-                    <select class="form-select" @onchange="FiltrerParType">
-                        <option value="">Tous les types</option>
-                        @if (typesVehicules != null)
+    <!-- Filtres Glassmorphism -->
+    <div class="glass-panel mb-5 p-4">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Type de véhicule</label>
+                <select class="form-select" @onchange="FiltrerParType">
+                    <option value="">Tous les types</option>
+                    @if (typesVehicules != null)
+                    {
+                        @foreach (var type in typesVehicules)
                         {
-                            @foreach (var type in typesVehicules)
-                            {
-                                <option value="@type.Id">@type.Libelle</option>
-                            }
+                            <option value="@type.Id">@type.Libelle</option>
                         }
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label>Prix maximum par jour</label>
-                    <input type="number" class="form-control" @bind="prixMax" @bind:event="oninput" @onchange="AppliquerFiltres" placeholder="Prix max" />
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button class="btn btn-secondary w-100" @onclick="ReinitialiserFiltres">
-                        Réinitialiser
-                    </button>
-                </div>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Budget max (Journalier)</label>
+                <input type="number" class="form-control" @bind="prixMax" @bind:event="oninput" @onchange="AppliquerFiltres" placeholder="Entrez un montant..." />
+            </div>
+            <div class="col-md-4 mb-3 d-flex align-items-end">
+                <button class="btn btn-secondary w-100" @onclick="ReinitialiserFiltres">
+                    <span class="oi oi-reload me-2"></span> Réinitialiser
+                </button>
             </div>
         </div>
     </div>
 
     @if (vehiculesFiltres == null)
     {
-        <div class="text-center">
-            <div class="spinner-border" role="status">
+        <div class="text-center py-5">
+            <div class="spinner-border text-gold" role="status">
                 <span class="visually-hidden">Chargement...</span>
             </div>
         </div>
@@ -53,16 +56,17 @@
     else if (!vehiculesFiltres.Any())
     {
         <div class="alert alert-info">
-            Aucun véhicule ne correspond à vos critères.
+            <span class="oi oi-info me-2"></span> Aucun véhicule ne correspond à vos critères d'excellence.
         </div>
     }
     else
     {
         <div class="row">
-            @foreach (var vehicule in vehiculesFiltres)
+            @foreach (var vehicule in PagedVehicles)
             {
-                <div class="col-md-4 mb-4" @key="vehicule.Id">
-                    <div class="card vehicle-card">
+                <div class="col-md-4 mb-4" @key="vehicule.Id" style="min-width: 300px;">
+                    <div class="card h-100">
+                        <!-- Image Container with Overlay -->
                         <div class="vehicle-image-container">
                             @if (vehicule.Images?.Any() == true)
                             {
@@ -70,193 +74,146 @@
                                      class="vehicle-image"
                                      alt="@vehicule.Marque @vehicule.Modele"
                                      loading="lazy" />
-                                <div class="image-overlay">
-                                    <div class="overlay-content">
-                                        <span class="oi oi-eye"></span>
-                                    </div>
-                                </div>
                             }
                             else
                             {
                                 <div class="no-image-fallback">
-                                    <span class="oi oi-image"></span>
-                                    <p>Image non disponible</p>
+                                    <span class="oi oi-image" style="font-size: 3rem; color: var(--gold-primary);"></span>
+                                    <p class="mt-2 text-gold">Image non disponible</p>
                                 </div>
                             }
+                            <div class="image-overlay">
+                                <span class="badge">Disponible</span>
+                            </div>
                         </div>
-                        <div class="card-body">
+
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title">@vehicule.Marque @vehicule.Modele</h5>
-                            <p class="card-text">
-                                <span class="info-item"><span class="oi oi-tag"></span> @vehicule.TypeVehicule?.Libelle</span>
-                                <span class="info-item"><span class="oi oi-euro"></span> @vehicule.PrixParJour.ToString("C") / jour</span>
-                                <span class="info-item"><span class="oi oi-dashboard"></span> @vehicule.Kilometrage.ToString("N0") km</span>
-                            </p>
-                            <span class="badge bg-success">Disponible</span>
-                        </div>
-                        <div class="card-footer">
-                            <button class="btn btn-primary w-100" @onclick="() => ReserverVehicule(vehicule.Id)">
-                                <span class="oi oi-check"></span> Réserver maintenant
-                            </button>
+                            
+                            <div class="vehicle-specs mb-3">
+                                <div class="spec-item">
+                                    <span class="oi oi-tag text-gold"></span> 
+                                    <span class="text-dim ms-2">@vehicule.TypeVehicule?.Libelle</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="oi oi-dashboard text-gold"></span>
+                                    <span class="text-dim ms-2">@vehicule.Kilometrage.ToString("N0") km</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="price-tag text-gold" style="font-size: 1.2rem; font-weight: 700;">
+                                        @vehicule.PrixParJour.ToString("C") <small class="text-dim" style="font-size: 0.8rem; font-weight: 400;">/ jour</small>
+                                    </span>
+                                </div>
+                                <button class="btn btn-primary w-100" @onclick="() => ReserverVehicule(vehicule.Id)">
+                                    <span class="oi oi-check me-2"></span> Réserver
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
         </div>
+
+        <!-- Pagination Controls -->
+        @if (TotalPages > 1)
+        {
+            <div class="d-flex justify-content-center mt-5 mb-5">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-luxury">
+                        <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+                            <button class="page-link" @onclick="PreviousPage" aria-label="Précédent">
+                                <span aria-hidden="true">&laquo;</span>
+                            </button>
+                        </li>
+                        
+                        @for (int i = 1; i <= TotalPages; i++)
+                        {
+                            var pageNumber = i;
+                            <li class="page-item @(CurrentPage == pageNumber ? "active" : "")">
+                                <button class="page-link" @onclick="() => GoToPage(pageNumber)">@pageNumber</button>
+                            </li>
+                        }
+
+                        <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+                            <button class="page-link" @onclick="NextPage" aria-label="Suivant">
+                                <span aria-hidden="true">&raquo;</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        }
     }
 </div>
 
 <style>
-    /* Conteneur des cards */
-    .row {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .col-md-4 {
-        display: flex;
-        flex: 0 0 33.333333%;
-        max-width: 33.333333%;
-        min-width: 33.333333%;
-    }
-
-    @@media (max-width: 768px) {
-        .col-md-4 {
-            flex: 0 0 100%;
-            max-width: 100%;
-            min-width: 100%;
-        }
-    }
-
-    /* ========== VEHICLE CARDS PREMIUM ========== */
-    .vehicle-card {
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-        .vehicle-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(11, 26, 46, 0.2);
-        }
-
-    /* ========== IMAGES Premium ========== */
+    /* Specific styles for vehicle cards if needed, augmenting theme.css */
     .vehicle-image-container {
         position: relative;
-        width: 100%;
-        padding-top: 66.67%; /* Ratio 3:2 */
+        height: 220px;
+        background: var(--navy-dark);
         overflow: hidden;
-        background: linear-gradient(135deg, #0B1A2E 0%, #152238 100%);
     }
-
+    
     .vehicle-image {
-        position: absolute;
-        top: 0;
-        left: 0;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform 0.5s ease;
     }
-
-    .vehicle-card:hover .vehicle-image {
-        transform: scale(1.1);
+    
+    .card:hover .vehicle-image {
+        transform: scale(1.05);
     }
-
-    .image-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(11, 26, 46, 0.8) 100%);
-        opacity: 0;
-        transition: opacity 0.4s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .vehicle-card:hover .image-overlay {
-        opacity: 1;
-    }
-
-    .overlay-content {
-        color: #C9A961;
-        font-size: 3rem;
-        transform: translateY(20px);
-        transition: transform 0.4s;
-    }
-
-    .vehicle-card:hover .overlay-content {
-        transform: translateY(0);
-    }
-
+    
     .no-image-fallback {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: rgba(201, 169, 97, 0.5);
+        background: rgba(212, 175, 55, 0.05);
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
     }
 
-        .no-image-fallback .oi {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .no-image-fallback p {
-            margin: 0;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-        }
-
-    /* ========== CARD BODY ========== */
-    .vehicle-card .card-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 200px;
+    /* Pagination Luxury */
+    .pagination-luxury {
+        gap: 5px;
     }
-
-    .card-title {
-        font-size: 1.25rem;
-        margin-bottom: 1rem;
-        min-height: 3rem;
+    
+    .pagination-luxury .page-link {
+        background: transparent;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: var(--text-dim);
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
     }
-
-    .card-text {
-        flex: 1;
+    
+    .pagination-luxury .page-link:hover {
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--gold-primary);
+        border-color: var(--gold-primary);
     }
-
-    /* ========== CARD FOOTER ========== */
-    .vehicle-card .card-footer {
-        padding: 1rem;
+    
+    .pagination-luxury .page-item.active .page-link {
+        background: var(--gold-primary);
+        color: var(--navy-dark);
+        border-color: var(--gold-primary);
     }
-
-        .vehicle-card .card-footer .btn {
-            padding: 0.75rem 1rem;
-        }
-
-    /* ========== INFO ITEMS ========== */
-    .info-item {
-        display: block;
-        margin-bottom: 0.75rem;
-        color: rgba(11, 26, 46, 0.7);
-        font-size: 0.95rem;
+    
+    .pagination-luxury .page-item.disabled .page-link {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: rgba(255,255,255,0.1);
     }
-
-        .info-item .oi {
-            color: #C9A961;
-            margin-right: 8px;
-        }
 </style>
 
 @code {
@@ -265,6 +222,16 @@
     private List<TypeVehicule> typesVehicules;
     private int? typeSelectionne;
     private decimal? prixMax;
+
+    // Pagination
+    private int PageSize = 6;
+    private int CurrentPage = 1;
+    
+    private int TotalPages => vehiculesFiltres == null ? 0 : (int)Math.Ceiling((double)vehiculesFiltres.Count / PageSize);
+    
+    private IEnumerable<Vehicule> PagedVehicles => vehiculesFiltres?
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize) ?? Enumerable.Empty<Vehicule>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -278,7 +245,6 @@
     {
         typeSelectionne = string.IsNullOrEmpty(e.Value?.ToString()) ? null : int.Parse(e.Value.ToString());
         AppliquerFiltres();
-        StateHasChanged();
     }
 
     private void AppliquerFiltres()
@@ -295,6 +261,8 @@
             vehiculesFiltres = vehiculesFiltres.Where(v => v.PrixParJour <= prixMax.Value).ToList();
         }
         
+        // Reset to page 1 on filter change
+        CurrentPage = 1;
         StateHasChanged();
     }
 
@@ -303,6 +271,7 @@
         typeSelectionne = null;
         prixMax = null;
         vehiculesFiltres = tousVehicules;
+        CurrentPage = 1;
         StateHasChanged();
     }
 
@@ -317,5 +286,27 @@
             return "/images/no-image.png";
 
         return $"/Images/{imagePath}";
+    }
+
+    // Pagination specific methods
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+        }
+    }
+
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+        }
+    }
+
+    private void GoToPage(int page)
+    {
+        CurrentPage = page;
     }
 }
