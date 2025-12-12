@@ -2,8 +2,18 @@ using Microsoft.EntityFrameworkCore;
 using rntlOS.Core.Data;
 using rntlOS.Core.Services;
 using rntlOS.FrontOffice.Components;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurer la culture marocaine pour afficher MAD au lieu de € ou $
+var culture = new CultureInfo("fr-MA");
+culture.NumberFormat.CurrencySymbol = " MAD";
+culture.NumberFormat.CurrencyDecimalDigits = 2;
+culture.NumberFormat.CurrencyPositivePattern = 3; // n MAD
+
+CultureInfo.DefaultThreadCurrentCulture = culture;
+CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 // Initialiser Serilog
 LogService.InitializeLogger("FrontOffice");

@@ -40,19 +40,32 @@ namespace rntlOS.Core.Services
                 {
                     try
                     {
-                        var marque = worksheet.Cells[row, 1].Text.Trim();
-                        var modele = worksheet.Cells[row, 2].Text.Trim();
+                        var marqueEtModele = worksheet.Cells[row, 1].Text.Trim();
+                        var anneeText = worksheet.Cells[row, 2].Text.Trim();
                         var matricule = worksheet.Cells[row, 3].Text.Trim();
-                        var anneeText = worksheet.Cells[row, 4].Text.Trim();
+                        var prixText = worksheet.Cells[row, 4].Text.Trim();
                         var kilometrageText = worksheet.Cells[row, 5].Text.Trim();
-                        var prixText = worksheet.Cells[row, 6].Text.Trim();
+                        var disponibleText = worksheet.Cells[row, 6].Text.Trim();
                         var typeVehiculeNom = worksheet.Cells[row, 7].Text.Trim();
-                        var disponibleText = worksheet.Cells[row, 8].Text.Trim();
+
+                        // Séparation Marque/Modèle (ex: "Toyota Corolla" -> "Toyota", "Corolla")
+                        var firstSpaceIndex = marqueEtModele.IndexOf(' ');
+                        string marque, modele;
+                        if (firstSpaceIndex > 0)
+                        {
+                            marque = marqueEtModele.Substring(0, firstSpaceIndex).Trim();
+                            modele = marqueEtModele.Substring(firstSpaceIndex + 1).Trim();
+                        }
+                        else
+                        {
+                            marque = marqueEtModele;
+                            modele = "";
+                        }
 
                         // Validation
-                        if (string.IsNullOrEmpty(marque) || string.IsNullOrEmpty(modele) || string.IsNullOrEmpty(matricule))
+                        if (string.IsNullOrEmpty(marque) || string.IsNullOrEmpty(matricule))
                         {
-                            errors.Add($"Ligne {row}: Marque, Modèle et Matricule sont obligatoires");
+                            errors.Add($"Ligne {row}: Marque et Matricule sont obligatoires");
                             continue;
                         }
 
@@ -64,9 +77,9 @@ namespace rntlOS.Core.Services
                         }
 
                         // Parser les valeurs
-                        if (!int.TryParse(anneeText, out int annee) || annee < 1900)
+                        if (!int.TryParse(anneeText, out int annee) || annee < 1900 || annee > DateTime.Now.Year + 1)
                         {
-                            errors.Add($"Ligne {row}: Année invalide");
+                            errors.Add($"Ligne {row}: Année invalide ({anneeText})");
                             continue;
                         }
 
@@ -106,7 +119,7 @@ namespace rntlOS.Core.Services
                             PrixParJour = prix,
                             TypeVehiculeId = typeVehicule.Id,
                             Disponible = disponible,
-                            DateMiseEnService = DateTime.Now
+                            DateMiseEnService = new DateTime(annee, 1, 1) // Utiliser l'année importée
                         };
 
                         context.Vehicules.Add(vehicule);
